@@ -19,8 +19,6 @@ ESPACO [\t]
 0[0-7]+							{return printf("Encontrei um OCTAL\n");}
 [1-9]{DIGITO}*					{return printf("Encontrei um DECIMAL\n");}
 0[x | X][0-9A-Fa-f]+			{return printf("Encontrei um HEXADECIMAL\n");}
-[(){}[\];,]						{ return printf("%s", yytext); }
-
 
 "pare"			{ return printf("Encontrei um pare\n");; }
 "caso"			{ return printf("Encontrei caso\n");}
@@ -50,17 +48,60 @@ ESPACO [\t]
 "short"			{ return printf("Encontrei short\n");}
 "unsigned"		{ return printf("Encontrei unsigned\n"); }
 
+"..."			{ return printf("Encontrei ...\n"); }
+">>="			{ return printf("Encontrei >>=\n"); }
+"<<="			{ return printf("Encontrei <<=\n"); }
+"+="			{ return printf("Encontrei +=\n"); }
+"-="			{ return printf("Encontrei -=\n"); }
+"*="			{ return printf("Encontrei *=\n");}
+"/="			{ return printf("Encontrei /=\n"); }
+"%="			{ return printf("Encontrei %=\n"); }
+"&="			{ return printf("Encontrei &=\n"); }
+"^="			{ return printf("Encontrei ^=\n"); }
+"|="			{ return printf("Encontrei |=\n"); }
+">>"			{ return printf("Encontrei >>\n"); }
+"<<"			{ return printf("Encontrei <<\n"); }
+"++"			{ return printf("Encontrei ++\n"); }
+"--"			{ return printf("Encontrei --\n"); }
+"->"			{ return printf("Encontrei ->\n"); }
+"&&"			{ return printf("Encontrei &&\n"); }
+"||"			{ return printf("Encontrei ||\n"); }
+"<="			{ return printf("Encontrei <=\n"); }
+">="			{ return printf("Encontrei >=\n"); }
+"=="			{ return printf("Encontrei ==\n"); }
+"!="			{ return printf("Encontrei !=\n"); }
+";"				{ return printf("Encontrei ;\n"); }
+"{"				{ return printf("Encontrei {\n"); }
+"}"				{ return printf("Encontrei }\n"); }
+"<%"			{ return printf("Encontrei <%\n"); }
+"%>"			{ return printf("Encontrei %>\n"); }
+","				{ return printf("Encontrei ,\n"); }
+":"				{ return printf("Encontrei :\n"); }
+"="				{ return printf("Encontrei =\n"); }
+"("				{ return printf("Encontrei (\n");}
+")"				{ return printf("Encontrei )\n"); }
+"["				{ return printf("Encontrei [\n"); }	
+"]"				{ return printf("Encontrei ]\n"); }
+"<:"			{ return printf("Encontrei <:\n"); }
+":>"			{ return printf("Encontrei :>\n"); }
+"."				{ return printf("Encontrei .\n"); }
+"&"				{ return printf("Encontrei &\n"); }
+"!"				{ return printf("Encontrei !\n"); }
+"~"				{ return printf("Encontrei ~\n"); }
+"-"				{ return printf("Encontrei -\n"); }
+"+"				{ return printf("Encontrei +\n"); }
+"*"				{ return printf("Encontrei *\n"); }
+"/"				{ return printf("Encontrei /\n"); }
+"%"				{ return printf("Encontrei %\n"); }
+"<"				{ return printf("Encontrei <\n"); }
+">"				{ return printf("Encontrei >\n"); }
+"^"				{ return printf("Encontrei ^:\n"); }
+"|"				{ return printf("Encontrei |\n"); }
+"?"				{ return printf("Encontrei ?\n"); }
 
-
-
-
-
-
-
-
-
-.								{ return printf("%s", yytext); }
-<<EOF>>							{ return X; }
+[ \t\v\n\f]		{ return printf("Encontrei %s\n", yytext); }
+.				{ return printf("%s", yytext); }
+<<EOF>>			{ return X; }
 
 %%
 
