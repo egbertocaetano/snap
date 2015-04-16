@@ -8,6 +8,8 @@
 0157
 0X10f
 pare	
+$nome
+$idade
 caso	
 constante
 continue
@@ -21,10 +23,11 @@ registrador
 retorna
 tamanhode
 estatico
-estrtura
+estrutura
 alterne
 tipodef
 vazio
+$endereco1
 enquanto	
 char
 double
@@ -32,6 +35,7 @@ float
 int	
 long
 signed
+$endereco2
 short
 unsigned
 ...	
@@ -84,4 +88,7 @@ unsigned
 ^
 |
 ?
-\t\v\n\f
+/*Comentario de uma linha*/
+//Cometario de uma linha
+/***********************************************************Comentario de uma linha hfdjahfjdsafldsaf
+fjkdashfjksdahjhdasfhjfldasfjldasfadslljjj*/

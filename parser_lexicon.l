@@ -6,10 +6,15 @@
 #define B	304
 #define X	399
 
+
+
+#include <stdio.h>
+
+static void comentario(void);
+
 %}
 DIGITO [0-9]
 LETRA [A-Za-z]
-ESPACO [\t]
 
 
 
@@ -19,6 +24,7 @@ ESPACO [\t]
 0[0-7]+							{return printf("Encontrei um OCTAL\n");}
 [1-9]{DIGITO}*					{return printf("Encontrei um DECIMAL\n");}
 0[x | X][0-9A-Fa-f]+			{return printf("Encontrei um HEXADECIMAL\n");}
+\${LETRA}+{DIGITO}*				{return printf("Encontrei um identificador\n");}
 
 "pare"			{ return printf("Encontrei um pare\n");; }
 "caso"			{ return printf("Encontrei caso\n");}
@@ -34,7 +40,7 @@ ESPACO [\t]
 "retorna"		{ return printf("Encontrei retorna\n");}
 "tamanhode"		{ return printf("Encontrei tamanhode\n");}
 "estatico"		{ return printf("Encontrei estatico\n");}
-"estrtura"		{ return printf("Encontrei estrutura\n");}
+"estrutura"		{ return printf("Encontrei estrutura\n");}
 "alterne"		{ return printf("Encontrei alterne\n");}
 "tipodef"		{ return printf("Encontrei tipodef\n"); }
 "vazio"			{ return printf("Encontrei vazio\n");}
@@ -99,11 +105,8 @@ ESPACO [\t]
 "|"				{ return printf("Encontrei |\n"); }
 "?"				{ return printf("Encontrei ?\n"); }
 "'"				{ return printf("Encontrei '\n"); }
-
-[\t]			{ return printf("Encontrei tab \n"); }
-[\v]			{ return printf("Encontrei espaço em branco\n"); }
-[\n]			{ return printf("Encontrei quebra de linha\n"); }
-[\f]			{ return printf("Encontrei  SEI LÁ\n"); }
+"/*"			{comentario();}
+"//".*			{return printf("Encontrei um comentario de uma linha\n");}
 .				{ return printf("%s\n", yytext); }
 <<EOF>>			{ return X; }
 
@@ -117,6 +120,9 @@ int main(int argc, char *argv[])
 		totalOct = 0,
 		totalHex = 0,
 		totalFlt = 0;
+
+
+	printf ("Vertical Tab \v");
 
 	if(argc == 2)
 	{
@@ -139,4 +145,26 @@ int main(int argc, char *argv[])
 		
 	}
 
+}
+
+
+static void comentario(void)
+{
+    int c;
+
+    while ((c = input()) != 0)
+        if (c == '*')
+        {
+            while ((c = input()) == '*')
+                ;
+
+            if (c == '/'){
+            	printf("Encontrei um comentario longo\n");
+                return;
+            }
+
+            if (c == 0)
+                break;
+        }
+    printf("Erro : Comentario nao finalizado\n");
 }
