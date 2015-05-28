@@ -26,10 +26,13 @@ struct ID
 
 map <string , ID> tabID;
 
+
+
 int yylex(void);
 void yyerror(string);
 string geraTemp(void);
 int existeID(string label);
+//string verificaInicializacao(string label);
 %}
 
 %token TK_NUM
@@ -110,6 +113,9 @@ E 			:'(' E ')'
 			} 
 			|E '+' E
 			{
+				/*string v1 = verificaInicializacao($1.traducao);
+				string v3 = verificaInicializacao($3.traducao);
+				cout << v1 + " " + v3 << endl;*/
 				$$.tmp = geraTemp();
 				$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + "+" + $3.tmp + ";\n";
 			}
@@ -182,3 +188,11 @@ int existeID(string label)
 		return 1;
 	return 0;
 }	
+
+/*int verificaInicializacao(string label)
+{
+	if(label == tabID[label].label)
+		return 1;
+	
+	return "";	
+}*/

@@ -8,7 +8,7 @@
 
 
 
-#include <stdio.h>
+#include <string>
 
 static void comentario(void);
 

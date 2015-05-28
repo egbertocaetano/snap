@@ -32,6 +32,8 @@ ID {LETRA}({LETRA}|{NUM})*
 {NUM}		{ yylval.valor = yytext; return TK_NUM; }
 {ID}		{ yylval.label = yytext; return TK_ID; }
 
+("//"[^\n]*)|("/*"[^"*/"]*"*/")			{}
+
 .			{ *yytext; }
 
 %%

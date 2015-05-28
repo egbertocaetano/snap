@@ -3,5 +3,6 @@ int main()
 	int i;
 	int j;
 	j = 10;
-	i = 1+1;
+	i = j+1;
+	//teste
 }
