@@ -14,6 +14,8 @@ struct atributos
 	string traducao;
 	string tmp;
 	string valor;
+	string tipo;
+	string operadorLogico;
 };
 
 struct ID
@@ -36,7 +38,7 @@ int existeID(string label);
 %}
 
 %token TK_NUM
-%token TK_MAIN TK_ID TK_TIPO_INT
+%token TK_MAIN TK_ID TK_TIPO TK_OPERADOR_LOGICO
 %token TK_FIM TK_ERROR
 
 %start S
@@ -48,9 +50,9 @@ int existeID(string label);
 
 %%
 
-S 			: TK_TIPO_INT TK_MAIN '(' ')' BLOCO
+S 			: TK_TIPO TK_MAIN '(' ')' BLOCO
 			{
-				cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
+				cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\n" + $1.tipo + " main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
 			}
 			;
 
@@ -75,28 +77,28 @@ COMANDO 	: DECLARACAO ';'
 			| ATRIBUICAO ';'
 			;
 
-DECLARACAO	:TK_TIPO_INT TK_ID '=' TK_NUM
+DECLARACAO	:TK_TIPO TK_ID '=' TK_NUM
 			{
 				struct ID id;
 				id.temp =  geraTemp();
-				id.tipo = $1.traducao;
+				id.tipo = $1.tipo;
 				id.label = $2.label;
 				id.valor = $4.valor;
 				$$.tmp = id.temp;
 				$$.label = id.label;
 				tabID[$$.label] = id;
-				//$$.traducao = "\t" + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
+				//$$.traducao = "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
 			} 
-			|TK_TIPO_INT TK_ID
+			|TK_TIPO TK_ID
 			{
 				struct ID id;
 				id.temp =  geraTemp();
-				id.tipo = $1.traducao;
+				id.tipo = $1.tipo;
 				id.label = $2.label;
 				$$.tmp = id.temp;
 				$$.label = id.label;
 				tabID[$$.label] = id;
-				//$$.traducao = "\t" + $$.tmp + " = " + tabID[$$.label].label + ";\n";
+				//$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
 			}
 			;
 ATRIBUICAO	: TK_ID '=' E
