@@ -89,7 +89,7 @@ DECLARACAO	:TIPO TK_ID '=' VALOR
 				$$.tmp = id.temp;
 				$$.label = id.label;
 				tabID[$$.label] = id;
-				$$.traducao = "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
+				//$$.traducao = "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
 			} 
 			|TIPO TK_ID
 			{
@@ -100,78 +100,9 @@ DECLARACAO	:TIPO TK_ID '=' VALOR
 				$$.tmp = id.temp;
 				$$.label = id.label;
 				tabID[$$.label] = id;
-				$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
-			}
-			/*TK_TIPO_INT TK_ID '=' VALOR
-			{
-				struct ID id;
-				id.temp =  geraTemp();
-				id.tipo = $1.tipo;
-				id.label = $2.label;
-				id.valor = $4.valor;
-				$$.tmp = id.temp;
-				$$.label = id.label;
-				tabID[$$.label] = id;
-				//$$.traducao = "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
-			} 
-			|TK_TIPO_INT TK_ID
-			{
-				struct ID id;
-				id.temp =  geraTemp();
-				id.tipo = $1.tipo;
-				id.label = $2.label;
-				$$.tmp = id.temp;
-				$$.label = id.label;
-				tabID[$$.label] = id;
 				//$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
 			}
-			|TK_TIPO_FLOAT TK_ID '=' TK_REAL
-			{
-				struct ID id;
-				id.temp =  geraTemp();
-				id.tipo = $1.tipo;
-				id.label = $2.label;
-				id.valor = $4.valor;
-				$$.tmp = id.temp;
-				$$.label = id.label;
-				tabID[$$.label] = id;
-				//$$.traducao = "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
-			} 
-			|TK_TIPO_FLOAT TK_ID
-			{
-				struct ID id;
-				id.temp =  geraTemp();
-				id.tipo = $1.tipo;
-				id.label = $2.label;
-				$$.tmp = id.temp;
-				$$.label = id.label;
-				tabID[$$.label] = id;
-				//$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
-			}
-			|TK_TIPO_FLOAT TK_ID '=' TK_REAL
-			{
-				struct ID id;
-				id.temp =  geraTemp();
-				id.tipo = $1.tipo;
-				id.label = $2.label;
-				id.valor = $4.valor;
-				$$.tmp = id.temp;
-				$$.label = id.label;
-				tabID[$$.label] = id;
-				//$$.traducao = "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
-			} 
-			|TK_TIPO_FLOAT TK_ID
-			{
-				struct ID id;
-				id.temp =  geraTemp();
-				id.tipo = $1.tipo;
-				id.label = $2.label;
-				$$.tmp = id.temp;
-				$$.label = id.label;
-				tabID[$$.label] = id;
-				//$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
-			}
-			;*/
+			;
 
 ATRIBUICAO	: TK_ID '=' E
 			{
