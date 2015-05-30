@@ -1,7 +1,8 @@
 int main()
 {	
-	float b;
+
+	float b = 1.0;
 	char c = 'c';
 	int a;
-	a = 1 + 2 * 4;
+	a = 1 + b * 4;
 }

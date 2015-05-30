@@ -54,7 +54,7 @@ int existeID(string label);
 
 S 			: TK_TIPO_INT TK_MAIN '(' ')' BLOCO
 			{
-				cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\n" + $1.tipo + " main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
+				cout << "/*Compilador snap*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\n" + $1.tipo + " main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
 			}
 			;
 
@@ -89,7 +89,7 @@ DECLARACAO	:TIPO TK_ID '=' VALOR
 				$$.tmp = id.temp;
 				$$.label = id.label;
 				tabID[$$.label] = id;
-				//$$.traducao = "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
+				$$.traducao = $4.traducao + "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
 			} 
 			|TIPO TK_ID
 			{
@@ -100,7 +100,7 @@ DECLARACAO	:TIPO TK_ID '=' VALOR
 				$$.tmp = id.temp;
 				$$.label = id.label;
 				tabID[$$.label] = id;
-				//$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
+				$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
 			}
 			;
 
