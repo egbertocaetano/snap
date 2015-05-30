@@ -37,7 +37,7 @@ int existeID(string label);
 //string verificaInicializacao(string label);
 %}
 
-%token TK_NUM TK_REAL
+%token TK_NUM TK_REAL TK_VALOR_LOGICO TK_CHAR
 %token TK_MAIN TK_ID
 %token TK_FIM TK_ERROR
 %token TK_OPERADOR_LOGICO TK_OPERADOR_RELACIONAL
@@ -52,7 +52,7 @@ int existeID(string label);
 
 %%
 
-S 			: TK_TIPO TK_MAIN '(' ')' BLOCO
+S 			: TK_TIPO_INT TK_MAIN '(' ')' BLOCO
 			{
 				cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\n" + $1.tipo + " main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl; 
 			}
@@ -79,7 +79,30 @@ COMANDO 	: DECLARACAO ';'
 			| ATRIBUICAO ';'
 			;
 
-DECLARACAO	:TK_TIPO_INT TK_ID '=' TK_NUM
+DECLARACAO	:TIPO TK_ID '=' VALOR
+			{
+				struct ID id;
+				id.temp =  geraTemp();
+				id.tipo = $1.tipo;
+				id.label = $2.label;
+				id.valor = $4.valor;
+				$$.tmp = id.temp;
+				$$.label = id.label;
+				tabID[$$.label] = id;
+				$$.traducao = "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
+			} 
+			|TIPO TK_ID
+			{
+				struct ID id;
+				id.temp =  geraTemp();
+				id.tipo = $1.tipo;
+				id.label = $2.label;
+				$$.tmp = id.temp;
+				$$.label = id.label;
+				tabID[$$.label] = id;
+				$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
+			}
+			/*TK_TIPO_INT TK_ID '=' VALOR
 			{
 				struct ID id;
 				id.temp =  geraTemp();
@@ -148,7 +171,8 @@ DECLARACAO	:TK_TIPO_INT TK_ID '=' TK_NUM
 				tabID[$$.label] = id;
 				//$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
 			}
-			;
+			;*/
+
 ATRIBUICAO	: TK_ID '=' E
 			{
 				
@@ -184,11 +208,11 @@ E 			:'(' E ')'
 				$$.tmp = geraTemp();	
 				$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + "/" + $3.tmp + ";\n";
 			}
-			| TK_NUM
-			{
+			| VALOR
+			/*{
 				$$.tmp = geraTemp();
 				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
-			}
+			}*/
 			| TK_ID
 			{
 				if(existeID($1.label))
@@ -204,6 +228,30 @@ E 			:'(' E ')'
 				}
 			}
 			;
+
+TIPO 		: TK_TIPO_INT | TK_TIPO_CHAR | TK_TIPO_FLOAT | TK_TIPO_STRING | TK_TIPO_BOOLEAN;
+
+VALOR 		: TK_NUM
+			{
+				$$.tmp = geraTemp();
+				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
+			}
+			| TK_REAL
+			{
+				$$.tmp = geraTemp();
+				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
+			}
+			|TK_CHAR
+			{
+				$$.tmp = geraTemp();
+				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
+			}
+			|TK_VALOR_LOGICO
+			{
+				$$.tmp = geraTemp();
+				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
+			}
+			;			
 %%
 
 #include "lex.yy.c"
