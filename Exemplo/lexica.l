@@ -21,11 +21,11 @@ ID {LETRA}({LETRA}|{NUM})*
 
 "main"		{return TK_MAIN;}
 
-"int"			{ yylval.tipo = yytext; return TK_TIPO;}
-"char"			{ yylval.tipo = yytext; return TK_TIPO;}
-"double"		{ yylval.tipo = yytext; return TK_TIPO;}
-"float"			{ yylval.tipo = yytext; return TK_TIPO;}
-"string"		{ yylval.tipo = yytext; return TK_TIPO;}
+"int"			{ yylval.tipo = yytext; return TK_TIPO_INT;}
+"char"			{ yylval.tipo = yytext; return TK_TIPO_CHAR;}
+"float"			{ yylval.tipo = yytext; return TK_TIPO_FLOAT;}
+"string"		{ yylval.tipo = yytext; return TK_TIPO_STRING;}
+"boolean"		{ yylval.tipo = yytext; return TK_TIPO_BOOLEAA;}
 
 "="			{return *yytext; }
 
@@ -33,8 +33,8 @@ ID {LETRA}({LETRA}|{NUM})*
 
 [+\-*/]		{ return *yytext; }
 
-"&&"			{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
-"||"			{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
+"&&"			{ yylval.operadorLogico = yytext; return TK_OPERADOR_RELACIONAL; }
+"||"			{ yylval.operadorLogico = yytext; return TK_OPERADOR_RELACIONAL; }
 "<"				{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
 ">"				{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
 "<="			{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
@@ -44,6 +44,10 @@ ID {LETRA}({LETRA}|{NUM})*
 
 
 {NUM}		{ yylval.valor = yytext; return TK_NUM; }
+{REAL}		{ yylval.valor = yytext; return TK_REAL; }
+{CHAR}		{ yylval.valor = yytext; return TK_CHAR; }
+"true"		{ yylval.valor = yytext; return TK_VALOR_LOGICO; }
+"false"		{ yylval.valor = yytext; return TK_VALOR_LOGICO; }
 {ID}		{ yylval.label = yytext; return TK_ID; }
 
 ("//"[^\n]*)|("/*"[^"*/"]*"*/")			{}
