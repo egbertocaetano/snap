@@ -3,6 +3,8 @@ int main()
 
 	float b = 1.0;
 	char c = 'c';
-	int a;
+	boolean t = TRUE;
+	int a = b;
 	a = 1 + b * 4;
+	t = (2 < 3 || 5 == a);
 }

@@ -1,6 +1,7 @@
 %{
 #include <string>
-
+int linha;
+int coluna;
 %}
 
 ESPACO [ \t]
@@ -31,23 +32,23 @@ ID {LETRA}({LETRA}|{NUM})*
 
 [(){}[\];,]	{ return *yytext; }
 
-[+\-*/]		{ return *yytext; }
+[+\-*/]		{ yylval.operador = yytext; return TK_OPERADOR_MATEMATICO; }
 
-"&&"			{ yylval.operadorLogico = yytext; return TK_OPERADOR_RELACIONAL; }
-"||"			{ yylval.operadorLogico = yytext; return TK_OPERADOR_RELACIONAL; }
-"<"				{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
-">"				{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
-"<="			{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
-">="			{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
-"=="			{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
-"!="			{ yylval.operadorLogico = yytext; return TK_OPERADOR_LOGICO; }
+"&&"			{ yylval.operador = yytext; return TK_OPERADOR_RELACIONAL; }
+"||"			{ yylval.operador = yytext; return TK_OPERADOR_RELACIONAL; }
+"<"				{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
+">"				{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
+"<="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
+">="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
+"=="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
+"!="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
 
 
-{NUM}		{ yylval.valor = yytext; return TK_NUM; }
-{REAL}		{ yylval.valor = yytext; return TK_REAL; }
-{CHAR}		{ yylval.valor = yytext; return TK_CHAR; }
-"true"		{ yylval.valor = yytext; return TK_VALOR_LOGICO; }
-"false"		{ yylval.valor = yytext; return TK_VALOR_LOGICO; }
+{NUM}		{ yylval.valor = yytext; yylval.tipo = "int"; return TK_NUM; }
+{REAL}		{ yylval.valor = yytext; yylval.tipo = "float"; return TK_REAL; }
+{CHAR}		{ yylval.valor = yytext; yylval.tipo = "char"; return TK_CHAR; }
+"TRUE"		{ yylval.valor = yytext; yylval.tipo = "boolean"; return TK_VALOR_LOGICO; }
+"FALSE"		{ yylval.valor = yytext; yylval.tipo = "boolean"; return TK_VALOR_LOGICO; }
 {ID}		{ yylval.label = yytext; return TK_ID; }
 
 ("//"[^\n]*)|("/*"[^"*/"]*"*/")			{}

@@ -15,7 +15,7 @@ struct atributos
 	string tmp;
 	string valor;
 	string tipo;
-	string operadorLogico;
+	string operador;
 };
 
 struct ID
@@ -40,14 +40,14 @@ int existeID(string label);
 %token TK_NUM TK_REAL TK_VALOR_LOGICO TK_CHAR
 %token TK_MAIN TK_ID
 %token TK_FIM TK_ERROR
-%token TK_OPERADOR_LOGICO TK_OPERADOR_RELACIONAL
+%token TK_OPERADOR_LOGICO TK_OPERADOR_RELACIONAL TK_OPERADOR_MATEMATICO
 %token TK_TIPO_INT TK_TIPO_CHAR TK_TIPO_FLOAT TK_TIPO_STRING TK_TIPO_BOOLEAN
 
 %start S
 
 %left '+' '-'
-%left '*' '/'
-%nonassoc '='
+%left '*' '/' 
+%nonassoc '='	
 
 
 %%
@@ -89,7 +89,7 @@ DECLARACAO	:TIPO TK_ID '=' VALOR
 				$$.tmp = id.temp;
 				$$.label = id.label;
 				tabID[$$.label] = id;
-				$$.traducao = $4.traducao + "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + tabID[$$.label].valor + ";\n";
+				$$.traducao = $4.traducao + "\t" + tabID[$$.label].tipo + " " + $$.tmp + " = " + $4.tmp + ";\n";
 			} 
 			|TIPO TK_ID
 			{
@@ -100,13 +100,12 @@ DECLARACAO	:TIPO TK_ID '=' VALOR
 				$$.tmp = id.temp;
 				$$.label = id.label;
 				tabID[$$.label] = id;
-				$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + " = " + tabID[$$.label].label + ";\n";
+				$$.traducao = "\t" + tabID[$$.label].tipo + " "  + $$.tmp + ";\n";
 			}
 			;
 
 ATRIBUICAO	: TK_ID '=' E
 			{
-				
 				$$.traducao = $1.traducao + $3.traducao + "\t" + tabID[$1.label].temp + " = " + $3.tmp + ";\n";
 			} 
 			;
@@ -116,34 +115,12 @@ E 			:'(' E ')'
 				$$.tmp = $2.tmp;
 				$$.traducao = $2.traducao;
 			} 
-			|E '+' E
-			{
-				/*string v1 = verificaInicializacao($1.traducao);
-				string v3 = verificaInicializacao($3.traducao);
-				cout << v1 + " " + v3 << endl;*/
-				$$.tmp = geraTemp();
-				$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + "+" + $3.tmp + ";\n";
-			}
-			|E '-' E
+			|E OPERADOR E
 			{
 				$$.tmp = geraTemp();	
-				$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + "-" + $3.tmp + ";\n";
-			}
-			|E '*' E
-			{
-				$$.tmp = geraTemp();	
-				$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + "*" + $3.tmp + ";\n";
-			}
-			|E '/' E
-			{
-				$$.tmp = geraTemp();	
-				$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + "/" + $3.tmp + ";\n";
-			}
+				$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";
+			}	
 			| VALOR
-			/*{
-				$$.tmp = geraTemp();
-				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
-			}*/
 			| TK_ID
 			{
 				if(existeID($1.label))
@@ -152,35 +129,33 @@ E 			:'(' E ')'
 					$$.label = tabID[$$.label].label;
 					//$$.traducao = "\t" + $$.tmp + " = " + tabID[$$.label].label + ";\n";
 				}
-				else
-				{
-					yyerror("Variavel '" + $1.label + "' nao declarada.");
-					return 0;
-				}
+				
 			}
 			;
+
+OPERADOR 	: TK_OPERADOR_LOGICO | TK_OPERADOR_RELACIONAL | TK_OPERADOR_MATEMATICO
 
 TIPO 		: TK_TIPO_INT | TK_TIPO_CHAR | TK_TIPO_FLOAT | TK_TIPO_STRING | TK_TIPO_BOOLEAN;
 
 VALOR 		: TK_NUM
 			{
 				$$.tmp = geraTemp();
-				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
+				$$.traducao = "\t" + $1.tipo + " " + $$.tmp + " = " + $1.valor + ";\n";
 			}
 			| TK_REAL
 			{
 				$$.tmp = geraTemp();
-				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
+				$$.traducao = "\t" + $1.tipo + " " + $$.tmp + " = " + $1.valor + ";\n";
 			}
 			|TK_CHAR
 			{
 				$$.tmp = geraTemp();
-				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
+				$$.traducao = "\t" + $1.tipo + " " + $$.tmp + " = " + $1.valor + ";\n";
 			}
 			|TK_VALOR_LOGICO
 			{
 				$$.tmp = geraTemp();
-				$$.traducao = "\t" + $$.tmp + " = " + $1.valor + ";\n";
+				$$.traducao = "\t" + $1.tipo + " " + $$.tmp + " = " + $1.valor + ";\n";
 			}
 			;			
 %%
@@ -215,6 +190,8 @@ int existeID(string label)
 {
 	if(label == tabID[label].label)
 		return 1;
+
+	yyerror("Variavel '" + label + "' nao declarada.");
 	return 0;
 }	
 
