@@ -34,7 +34,7 @@ int yylex(void);
 void yyerror(string);
 string geraTemp(void);
 int existeID(string label);
-int verificaInicializacao(atributos a);
+string verificaInicializacao(string label);
 %}
 
 %token TK_NUM TK_REAL TK_VALOR_LOGICO TK_CHAR
