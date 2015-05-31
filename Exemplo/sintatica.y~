@@ -224,7 +224,7 @@ int verificaInicializacao(atributos a)
 		if(tabID[a.label].valor != "")			
 			return 1; // eh uma variavel inicializada
 	}else if(a.valor != "")
-		return 1; // eh um numero
+			return 1; // eh um numero
 
 	yyerror("Variavel '" + a.label + "' nao inicializada.");
 	return 0;	
