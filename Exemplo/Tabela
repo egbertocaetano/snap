@@ -1,0 +1,101 @@
+map<string, string> cria_tabela_tipos_retorno()
+{
+    map<string, string> tabela_tipos;
+    
+    //Tabela de Operação para soma
+    tabela_tipos["int+int"] = "int";
+    tabela_tipos["int+float"] = "float";
+    tabela_tipos["float+int"] = "float";
+    tabela_tipos["int+string"] = "string";
+    tabela_tipos["string+int"] = "string";
+    tabela_tipos["int+char"] = "char"; //Verificar se será esse tipo mesmo para essa operação
+    tabela_tipos["char+int"] = "char";
+    tabela_tipos["float+float"] = "float";
+    tabela_tipos["float+string"] = "string";
+    tabela_tipos["string+float"] = "string";
+    tabela_tipos["char+char"] = "string";
+    tabela_tipos["char+string"] = "string";
+    tabela_tipos["string+char"] = "string";
+    tabela_tipos["string+string"] = "string";
+ 
+    //Tabela de Operação para subtração    
+    tabela_tipos["int-int"] = "int";
+    tabela_tipos["int-float"] = "float";
+    tabela_tipos["float-int"] = "float";
+    tabela_tipos["int-string"] = "string";
+    tabela_tipos["string-int"] = "string";
+    tabela_tipos["int-char"] = "char"; //Verificar se será esse tipo mesmo para essa operação
+    tabela_tipos["char-int"] = "char";
+    tabela_tipos["float-float"] = "float";
+    tabela_tipos["float-string"] = "string";
+    tabela_tipos["string-float"] = "string";
+    tabela_tipos["char-char"] = "string";
+    tabela_tipos["char-string"] = "string";
+    tabela_tipos["string-char"] = "string";
+    tabela_tipos["string-string"] = "string";
+
+    //Tabela de Operação para multiplicação
+    tabela_tipos["int*int"] = "int";
+    tabela_tipos["int*float"] = "float";
+    tabela_tipos["float*float"] = "float";
+    
+    //Tabela de Operação para divisão
+    tabela_tipos["int/int"] = "int";
+    tabela_tipos["int/float"] = "float";
+    tabela_tipos["float/float"] = "float";
+    
+	// Para operadores relacionais e atribuicao, a tabela da o tipo de cast6  
+    tabela_tipos["float>float"] = "boolean";
+    tabela_tipos["int>int"] = "boolean";
+    tabela_tipos["float>int"] = "boolean";
+    tabela_tipos["char>char"] = "int";    
+	tabela_tipos["string>string"] = "int"; //@ TODO
+    tabela_tipos["int>=int"] = "int";
+    tabela_tipos["float>=float"] = "int";
+    tabela_tipos["float>=int"] = "float";
+    tabela_tipos["char>=char"] = "int";
+    tabela_tipos["string>=string"] = "int"; //@ TODO
+    
+    //tabela_tipos["int<int"] = "int";
+    //tabela_tipos["float<float"] = "";
+    tabela_tipos["float<int"] = "float";
+    //tabela_tipos["char<char"] = "int";
+    //tabela_tipos["string<string"] = "int";
+    
+    //tabela_tipos["int<=int"] = "int";
+    //tabela_tipos["float<=float"] = "int";
+    tabela_tipos["float<=int"] = "float";
+    //tabela_tipos["char<=char"] = "int";
+    //tabela_tipos["string<=string"] = "int"; //@ TODO
+    
+    //tabela_tipos["int==int"] = "int";
+    //tabela_tipos["float==float"] = "int";
+    tabela_tipos["float==int"] = "float";
+    //tabela_tipos["char==char"] = "int";
+    //tabela_tipos["string==string"] = "int";
+    
+    //tabela_tipos["int!=int"] = "int";
+    //tabela_tipos["float!=float"] = "int";
+    tabela_tipos["float!=int"] = "float";
+    //tabela_tipos["char!=char"] = "int";
+    //tabela_tipos["string!=string"] = "int";
+    
+    //tabela_tipos["int&&int"] = "int";
+    //tabela_tipos["int||int"] = "int";
+    
+    tabela_tipos["int=float"] = "int";
+    tabela_tipos["int=char"] = "int";
+    tabela_tipos["int=unsigned short int"] = "int";
+    
+    tabela_tipos["float=int"] = "float";
+    tabela_tipos["float=unsigned short int"] = "float";
+    
+    tabela_tipos["char=int"] = "char";
+    
+    tabela_tipos["string=char"] = "string";
+    
+	tabela_tipos["float=int"] = "float";
+    tabela_tipos["unsigned short int=int"] = "unsigned short int";	
+    
+    return tabela_tipos;   
+}

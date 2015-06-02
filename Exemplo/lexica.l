@@ -28,11 +28,11 @@ ID {LETRA}({LETRA}|{NUM})*
 "string"		{ yylval.tipo = yytext; return TK_TIPO_STRING;}
 "boolean"		{ yylval.tipo = yytext; return TK_TIPO_BOOLEAN;}
 
-"="			{return *yytext; }
+"="				{yylval.operador = yytext; return TK_ATRIBUICAO;}
 
 [(){}[\];,]	{ return *yytext; }
 
-[+\-*/]		{ yylval.operador = yytext; return TK_OPERADOR_MATEMATICO; }
+[+\-*/]			{yylval.operador = yytext; return TK_OPERADOR_MATEMATICO; }
 
 "&&"			{ yylval.operador = yytext; return TK_OPERADOR_RELACIONAL; }
 "||"			{ yylval.operador = yytext; return TK_OPERADOR_RELACIONAL; }
