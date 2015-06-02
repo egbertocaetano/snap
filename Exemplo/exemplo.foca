@@ -1,6 +1,15 @@
 int main()
 {	
 
+<<<<<<< HEAD
 	float b = 0.0;
 	int a = b * 4;
+=======
+	float b = 1.0;
+	char c = 'c';
+	boolean t = TRUE;
+	int a = 0;
+	a = 1 + b * 4;
+	t = (2 < 3 || 5 == a);
+>>>>>>> 840f89d72acbeb92ea0b06d0460b9a88cd998adb
 }

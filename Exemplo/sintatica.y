@@ -32,6 +32,7 @@ int yylex(void);
 void yyerror(string);
 string geraTemp(void);
 int existeID(string label);
+<<<<<<< HEAD
 //string verificaInicializacao(string label);
 string getTipo(string operacao);
 map<string, string> criaTabTipoRetorno();
@@ -40,6 +41,9 @@ map<string, string> criaTabTipoRetorno();
 //Declarações de variaveis globais
 map <string , ID> tabID;
 map<string, string> tabTipos = criaTabTipoRetorno();
+=======
+int verificaInicializacao(atributos a);
+>>>>>>> 840f89d72acbeb92ea0b06d0460b9a88cd998adb
 %}
 
 %token TK_NUM TK_REAL TK_VALOR_LOGICO TK_CHAR
@@ -192,6 +196,7 @@ E 			:'(' E ')'
 			} 
 			|E OPERADOR E
 			{
+<<<<<<< HEAD
 				//Verificando tipo das variaveis para decidir o tipo da nova variavel temporaria 
 				if($1.tipo != $3.tipo)
 				{
@@ -206,6 +211,14 @@ E 			:'(' E ')'
 					$$.tipo = $1.tipo;	
 					$$.traducao = $1.traducao + $3.traducao + "\t" + $1.tipo + " " + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";	
 				}
+=======
+
+				if(verificaInicializacao($1) && verificaInicializacao($3)){
+					
+					$$.tmp = geraTemp();	
+					$$.traducao = $1.traducao+ $3.traducao+ "\t" + $$.tmp+ " = " + $1.tmp+ $2.operador + $3.tmp + ";\n";
+				}			
+>>>>>>> 840f89d72acbeb92ea0b06d0460b9a88cd998adb
 			}	
 			| VALOR
 			| TK_ID
@@ -288,8 +301,9 @@ int existeID(string label)
 	return 0;
 }	
 
-/*int verificaInicializacao(string label)
+int verificaInicializacao(atributos a)
 {
+<<<<<<< HEAD
 	if(label == tabID[label].label)
 		return 1;
 	
@@ -427,3 +441,13 @@ map<string, string> criaTabTipoRetorno()
     
     return tabela_tipos;   
 }
+=======
+	if(existeID(a.label)){
+		if(tabID[a.label].valor != "")			
+			return 1; // eh uma variavel inicializada
+	}else if(a.valor != "")
+		return 1; // eh um numero
+	yyerror("Variavel '" + a.label + "' nao inicializada.");
+	return 0;	
+}
+>>>>>>> 840f89d72acbeb92ea0b06d0460b9a88cd998adb
