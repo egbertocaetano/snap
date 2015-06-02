@@ -3,4 +3,6 @@ int main()
 
 	float b = 0.0;
 	int a = b * 4;
+	boolean c = TRUE;
+	c = 5<3<4;
 }
