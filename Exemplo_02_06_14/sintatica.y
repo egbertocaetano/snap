@@ -90,7 +90,7 @@ DECLARACAO	:TIPO TK_ID TK_ATRIBUICAO VALOR
 				//Verificando tipo das variaveis para decidir o tipo da nova variavel temporaria 
 				if($1.tipo != $4.tipo)
 				{	
-					string tipo = getTipo(tabID[$1.label].tipo + $3.operador + $2.tipo);
+					string tipo = getTipo($1.tipo + $3.operador + $4.tipo);
 
 					struct ID id;
 					id.temp =  geraTemp();
@@ -124,7 +124,7 @@ DECLARACAO	:TIPO TK_ID TK_ATRIBUICAO VALOR
 				//Verificando tipo das variaveis para decidir o tipo da nova variavel temporaria 
 				if($1.tipo != $4.tipo)
 				{	
-					string tipo = getTipo(tabID[$1.label].tipo + $3.operador + $2.tipo);
+					string tipo = getTipo($1.tipo + $3.operador + $4.tipo);
 
 					struct ID id;
 					id.temp =  geraTemp();
@@ -176,7 +176,7 @@ ATRIBUICAO	: TK_ID TK_ATRIBUICAO E
 						string tipo = getTipo(tabID[$1.label].tipo + $2.operador + $3.tipo);	
 						$$.traducao = $1.traducao + $3.traducao + "\t" + tabID[$1.label].temp + " = " + "(" + tipo + ") " + $3.tmp + ";\n";
 					}	
-					else
+					else 
 					{
 						$$.traducao = $1.traducao + $3.traducao + "\t" + tabID[$1.label].temp + " = " + $3.tmp + ";\n";
 					}
