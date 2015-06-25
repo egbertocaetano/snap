@@ -1,3 +1,4 @@
+int var = 10;
 int main()
 {	
 	int tests;
