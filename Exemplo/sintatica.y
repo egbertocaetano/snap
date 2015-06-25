@@ -27,18 +27,20 @@ typedef struct atributos atributos;
 typedef map<string , atributos> TABELA;
 typedef map<string , atributos>::iterator ITERATOR;
 
+#define GLOBAL 1
+#define LOCAL 0
 
 //Declarações de protótipos de funções
 int yylex(void);
 void yyerror(string);
-string geraTemp(string tipo);
+string geraTemp(string tipo, int ehGlobal);
 bool pertenceContextoAtual(string label);
 TABELA * existeID(string label);
 string getTipo(string operacao);
 map<string, string> criaTabTipoRetorno();
 //void declaracoes();/*Essa função cria uma string que ira declarar as variaveis que serão utilizadas durante a execução do código*/
-void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4);
-void processaTK_ATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4);
+void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4, int ehGlobal);
+void processaTK_ATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3);
 void processaTK_VALOR(atributos * dolar, atributos * dolar1, string tipo);
 void operacaoAritmetica(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3);
 void castTemp(atributos * dolar, atributos * dolar1, atributos* dolar2, atributos* dolar3, string tipo);
@@ -48,6 +50,7 @@ void terminaEscopo();
 
 //Declarações de variaveis globais
 string declaraVariaveis="";
+string declaraVariaveisGlobais="";
 TABELA tabLabel;
 map<string, string> tabTipos = criaTabTipoRetorno();
 list<TABELA*> pilhaDeTabelas;
@@ -76,23 +79,27 @@ START 		: ESCOPO_GLOBAL S
 				cout <<$2.traducao << endl;
 			};
 
-S 			: DECLARACAO ';' MAIN
+S 			: DECL_GLOBAL ';' MAIN
 			{
-				$$.traducao = $1.traducao + "\n" + $3.traducao;
+				$$.traducao = "\n" + declaraVariaveisGlobais + "\n" + $1.tipo + " main(void)\n{\n" 
+							  + declaraVariaveis + "\n" 
+							  + $1.traducao 
+							  + $3.traducao 
+							  + "\treturn 0;\n}"; 
 			}
 			| MAIN;
 
 MAIN        :TK_TIPO_INT TK_MAIN '(' ')' BLOCO
 			{
 
-				$$.traducao = $1.tipo + " main(void)\n{\n" + declaraVariaveis + "\n" + $5.traducao + "\treturn 0;\n}"; 
+				$$.traducao = $5.traducao; 
 				
 			}
 			;
 
 ESCOPO_GLOBAL: 
 			 {
-			 	iniciaEscopo();
+			 	iniciaEscopo(); 
 
 			 };
 
@@ -128,16 +135,36 @@ COMANDO 	: DECLARACAO ';'
 			| ATRIBUICAO ';'
 			;
 
+DECL_GLOBAL : TIPO TK_ID TK_ATRIBUICAO VALOR
+			{
+				processaDECLARACAO(&$$, &$1, &$2, &$3, &$4, GLOBAL);
+			}
+			|TIPO TK_ID
+			{
+				TABELA * tab = pilhaDeTabelas.front();
+
+				atributos id;
+				id.tmp =  geraTemp($1.tipo, GLOBAL);
+				id.tipo = $1.tipo;
+				id.label = $2.label;
+				$$.tmp = id.tmp;
+				$$.label = id.label;
+				tabLabel[$$.label] = id;
+				(*tab)[$$.label] = id;
+				$$.traducao = "";
+				//$$.traducao = "\t" + tabLabel[$$.label].tipo + " "  + $$.tmp + ";\n";
+			};
+
 DECLARACAO	:TIPO TK_ID TK_ATRIBUICAO VALOR
 			{
 									
-				processaDECLARACAO(&$$, &$1, &$2, &$3, &$4);
+				processaDECLARACAO(&$$, &$1, &$2, &$3, &$4, LOCAL);
 				
 			} 
 			|TIPO TK_ID TK_ATRIBUICAO E
 			{	
 
-				processaDECLARACAO(&$$, &$1, &$2, &$3, &$4);
+				processaDECLARACAO(&$$, &$1, &$2, &$3, &$4, LOCAL);
 
 			} 
 			|TIPO TK_ID
@@ -145,7 +172,7 @@ DECLARACAO	:TIPO TK_ID TK_ATRIBUICAO VALOR
 				TABELA * tab = pilhaDeTabelas.front();
 
 				atributos id;
-				id.tmp =  geraTemp($1.tipo);
+				id.tmp =  geraTemp($1.tipo, LOCAL);
 				id.tipo = $1.tipo;
 				id.label = $2.label;
 				$$.tmp = id.tmp;
@@ -194,13 +221,13 @@ E 			:'(' E ')'
 				if($1.tipo != $3.tipo)
 				{
 					string tipo = getTipo($1.tipo +  $2.operador + $3.tipo);
-					$$.tmp = geraTemp(tipo);
+					$$.tmp = geraTemp(tipo, LOCAL);
 					$$.tipo = tipo;	
 					$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";
 				}	
 				else
 				{
-					$$.tmp = geraTemp($1.tipo);
+					$$.tmp = geraTemp($1.tipo, LOCAL);
 					$$.tipo = $1.tipo;	
 					$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";	
 				}
@@ -211,13 +238,13 @@ E 			:'(' E ')'
 				if($1.tipo != $3.tipo)
 				{
 					string tipo = getTipo($1.tipo +  $2.operador + $3.tipo);
-					$$.tmp = geraTemp(tipo);
+					$$.tmp = geraTemp(tipo, LOCAL);
 					$$.tipo = tipo;	
 					$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";
 				}	
 				else
 				{
-					$$.tmp = geraTemp($1.tipo);
+					$$.tmp = geraTemp($1.tipo, LOCAL);
 					$$.tipo = $1.tipo;	
 					$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";	
 				}
@@ -277,13 +304,18 @@ void yyerror( string MSG )
 	exit (0);
 }
 
-string geraTemp(string tipo){
+string geraTemp(string tipo, int ehGlobal){
 	
 	static int i = 0;
 	stringstream ss;
 	ss << "temp" << i++;
 
-	declaraVariaveis += "\t" + tipo + " " + ss.str() + ";\n";
+	if(ehGlobal == 1)
+		declaraVariaveisGlobais += tipo + " " + ss.str() + ";\n";
+	else
+		declaraVariaveis += "\t" + tipo + " " + ss.str() + ";\n";
+	
+
 	return ss.str();
 }			
 
@@ -337,10 +369,10 @@ string getTipo(string operacao)
 
 	return tipo;
 }
-void processaTK_ATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4)
+void processaTK_ATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3)
 {
 
-	/*TABELA * tab1 = existeID(dolar1->label);
+	TABELA * tab1 = existeID(dolar1->label);
 	if(tab1 == NULL)
 	{
 		cout << "dolar1" << endl;
@@ -348,38 +380,27 @@ void processaTK_ATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * do
 	}
 
 	
-	TABELA * tab2 = existeID(dolar4->label);
+	TABELA * tab2 = existeID(dolar3->label);
 	if(tab2 == NULL)
 	{
-		cout << "dolar4" << endl;
-		yyerror( "Variavel " + dolar4->label + " nao declarada!");
+		cout << "dolar3" << endl;
+		yyerror( "Variavel " + dolar3->label + " nao declarada!");
 	}
 
 	//Verificando tipo para ver a necessidade de cast
-	if(dolar1->tipo != dolar4->tipo)
+	if(dolar1->tipo != dolar3->tipo)
 	{	
-		string tipo = getTipo(dolar1->tipo + dolar3->operador + dolar4->tipo);
+		string tipo = getTipo((*tab1)[dolar1->label].tipo + dolar2->operador + (*tab2)[dolar3->label].tipo);
 
-		(*tab1)[dolar2->label].tmp =  geraTemp(tipo);
-		(*tab1)[dolar2->label].tipo = dolar1->tipo;
-		(*tab1)[dolar2->label].label = dolar2->label;
-		
-		dolar->tmp = (*tab1)[dolar2->label].tmp;
-		dolar->label = (*tab1)[dolar2->label].label;
-		dolar->traducao = dolar4->traducao + "\t" + (*tab1)[dolar2->label].tmp + " = " + "(" + tipo + ") " + dolar4->tmp + ";\n";
+		dolar->traducao = dolar1->traducao + dolar3->traducao + "\t" + (*tab1)[dolar1->label].tmp + " = " + "(" + tipo + ") " + (*tab2)[dolar3->label].tmp + ";\n";
 	}	
 	else
 	{
-		(*tab2)[dolar2->label].tmp =  geraTemp(dolar1->tipo);
-		(*tab2)[dolar2->label].tipo = dolar1->tipo;
-		(*tab2)[dolar2->label].label = dolar2->label;
-
-		dolar->tmp = (*tab2)[dolar2->label].tmp;
-		dolar->label = (*tab2)[dolar2->label].label;
-		dolar->traducao = dolar4->traducao  + "\t" + (*tab2)[dolar2->label].tmp + " = " + dolar4->tmp + ";\n";
-	}*/
+		dolar->traducao = dolar1->traducao + dolar3->traducao  + "\t" + (*tab1)[dolar1->label].tmp + " = " + (*tab2)[dolar3->label].tmp + ";\n";
+	}
 }
-void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4)
+
+/*void processaDECLARACAOGLOBAL(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4)
 {
 	TABELA * tab = pilhaDeTabelas.front();
 
@@ -388,7 +409,42 @@ void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar
 	{	
 		string tipo = getTipo(dolar1->tipo + dolar3->operador + dolar4->tipo);
 
-		(*tab)[dolar2->label].tmp =  geraTemp(tipo);
+		(*tab)[dolar2->label].tmp =  geraTemp(tipo, GLOBAL);
+		(*tab)[dolar2->label].tipo = dolar1->tipo;
+		(*tab)[dolar2->label].label = dolar2->label;
+		
+		dolar->tmp = (*tab)[dolar2->label].tmp;
+		dolar->label = (*tab)[dolar2->label].label;
+		dolar->traducao = dolar4->traducao + "\t" + (*tab)[dolar2->label].tmp + " = " + "(" + tipo + ") " + dolar4->tmp + ";\n";
+
+		//Gerando variaveis globais
+		declaraVariaveisGlobais += (*tab)[dolar2->label].tipo + " " + (*tab)[dolar2->label].tmp + ";\n";
+	}	
+	else
+	{
+		(*tab)[dolar2->label].tmp =  geraTemp(dolar1->tipo, GLOBAL);
+		(*tab)[dolar2->label].tipo = dolar1->tipo;
+		(*tab)[dolar2->label].label = dolar2->label;
+
+		dolar->tmp = (*tab)[dolar2->label].tmp;
+		dolar->label = (*tab)[dolar2->label].label;
+		dolar->traducao = dolar4->traducao  + "\t" + (*tab)[dolar2->label].tmp + " = " + dolar4->tmp + ";\n";
+
+		//Gerando variaveis globais
+		declaraVariaveisGlobais += (*tab)[dolar2->label].tipo + " " + (*tab)[dolar2->label].tmp + ";\n";
+	}
+}*/
+
+void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4, int ehGlobal)
+{
+	TABELA * tab = pilhaDeTabelas.front();
+
+	//Verificando tipo para ver a necessidade de cast
+	if(dolar1->tipo != dolar4->tipo)
+	{	
+		string tipo = getTipo(dolar1->tipo + dolar3->operador + dolar4->tipo);
+
+		(*tab)[dolar2->label].tmp =  geraTemp(tipo, ehGlobal);
 		(*tab)[dolar2->label].tipo = dolar1->tipo;
 		(*tab)[dolar2->label].label = dolar2->label;
 		
@@ -398,7 +454,7 @@ void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar
 	}	
 	else
 	{
-		(*tab)[dolar2->label].tmp =  geraTemp(dolar1->tipo);
+		(*tab)[dolar2->label].tmp =  geraTemp(dolar1->tipo, ehGlobal);
 		(*tab)[dolar2->label].tipo = dolar1->tipo;
 		(*tab)[dolar2->label].label = dolar2->label;
 
@@ -413,7 +469,7 @@ void processaTK_VALOR(atributos * dolar, atributos * dolar1, string tipo)
 	TABELA * tab = pilhaDeTabelas.front();
 
 	atributos id;
-	id.tmp =  geraTemp(tipo);
+	id.tmp =  geraTemp(tipo, LOCAL);
 	id.label = id.tmp;
 	id.tipo = tipo;
 	id.valor = dolar1->valor;
@@ -437,7 +493,7 @@ void operacaoAritmetica(atributos * dolar, atributos * dolar1, atributos * dolar
 	}	
 	else
 	{
-		dolar->tmp = geraTemp(dolar1->tipo);
+		dolar->tmp = geraTemp(dolar1->tipo, LOCAL);
 		dolar->tipo = dolar1->tipo;	
 		dolar->traducao = dolar1->traducao + dolar3->traducao + "\t" + dolar->tmp + " = " + dolar1->tmp + " " + dolar2->operador + " " + dolar3->tmp + ";\n";	
 
@@ -455,13 +511,13 @@ void castTemp(atributos * dolar, atributos * dolar1, atributos* dolar2, atributo
 
 	if (dolar1->tipo != tipo)
 	{
-		castT.tmp = geraTemp(tipo);
+		castT.tmp = geraTemp(tipo, LOCAL);
 		castT.label = castT.tmp;
 		castT.tipo = tipo;
 		castT.traducao = "\t" + castT.tmp + " = (" +  tipo + ") "  + dolar1->tmp + ";\n";
 		tabLabel[castT.label] = castT;
 		
-		dolar->tmp = geraTemp(tipo);
+		dolar->tmp = geraTemp(tipo, LOCAL);
 		dolar->tipo = tipo;	
 		dolar->traducao += dolar1->traducao + dolar3->traducao + castT.traducao + "\t" + dolar->tmp + " = " + dolar1->tmp + " " + dolar2->operador + " " + castT.tmp + ";\n";
 
@@ -473,13 +529,13 @@ void castTemp(atributos * dolar, atributos * dolar1, atributos* dolar2, atributo
 	}
 	else
 	{
-		castT.tmp = geraTemp(tipo);
+		castT.tmp = geraTemp(tipo, LOCAL);
 		castT.label = castT.tmp;
 		castT.tipo = tipo;
 		castT.traducao = "\t" + castT.tmp + " = (" +  tipo + ") "  + dolar3->tmp + ";\n";
 		tabLabel[castT.label] = castT;
 
-		dolar->tmp = geraTemp(tipo);
+		dolar->tmp = geraTemp(tipo, LOCAL);
 		dolar->tipo = tipo;	
 		dolar->traducao += dolar1->traducao + dolar3->traducao + castT.traducao + "\t" + dolar->tmp + " = " + dolar1->tmp + " " + dolar2->operador + " " + castT.tmp + ";\n";
 
