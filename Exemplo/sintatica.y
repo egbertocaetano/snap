@@ -42,6 +42,7 @@ map<string, string> criaTabTipoRetorno();
 void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4, int ehGlobal);
 void processaTK_ATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3);
 void processaTK_VALOR(atributos * dolar, atributos * dolar1, string tipo);
+void processaTK_ID(atributos * dolar, atributos * dolar1, atributos * dolar2, int ehGlobal);
 void operacaoAritmetica(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3);
 void castTemp(atributos * dolar, atributos * dolar1, atributos* dolar2, atributos* dolar3, string tipo);
 void iniciaEscopo();
@@ -141,7 +142,8 @@ DECL_GLOBAL : TIPO TK_ID TK_ATRIBUICAO VALOR
 			}
 			|TIPO TK_ID
 			{
-				TABELA * tab = pilhaDeTabelas.front();
+				processaTK_ID(&$$, &$1, &$2, GLOBAL);
+/*				TABELA * tab = pilhaDeTabelas.front();
 
 				atributos id;
 				id.tmp =  geraTemp($1.tipo, GLOBAL);
@@ -151,7 +153,7 @@ DECL_GLOBAL : TIPO TK_ID TK_ATRIBUICAO VALOR
 				$$.label = id.label;
 				tabLabel[$$.label] = id;
 				(*tab)[$$.label] = id;
-				$$.traducao = "";
+				$$.traducao = "";*/
 				//$$.traducao = "\t" + tabLabel[$$.label].tipo + " "  + $$.tmp + ";\n";
 			};
 
@@ -169,7 +171,9 @@ DECLARACAO	:TIPO TK_ID TK_ATRIBUICAO VALOR
 			} 
 			|TIPO TK_ID
 			{
-				TABELA * tab = pilhaDeTabelas.front();
+				 processaTK_ID(&$$, &$1, &$2, LOCAL);
+
+				/*TABELA * tab = pilhaDeTabelas.front();
 
 				atributos id;
 				id.tmp =  geraTemp($1.tipo, LOCAL);
@@ -179,7 +183,7 @@ DECLARACAO	:TIPO TK_ID TK_ATRIBUICAO VALOR
 				$$.label = id.label;
 				tabLabel[$$.label] = id;
 				(*tab)[$$.label] = id;
-				$$.traducao = "";
+				$$.traducao = "";*/
 				//$$.traducao = "\t" + tabLabel[$$.label].tipo + " "  + $$.tmp + ";\n";
 			};
 
@@ -400,41 +404,6 @@ void processaTK_ATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * do
 	}
 }
 
-/*void processaDECLARACAOGLOBAL(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4)
-{
-	TABELA * tab = pilhaDeTabelas.front();
-
-	//Verificando tipo para ver a necessidade de cast
-	if(dolar1->tipo != dolar4->tipo)
-	{	
-		string tipo = getTipo(dolar1->tipo + dolar3->operador + dolar4->tipo);
-
-		(*tab)[dolar2->label].tmp =  geraTemp(tipo, GLOBAL);
-		(*tab)[dolar2->label].tipo = dolar1->tipo;
-		(*tab)[dolar2->label].label = dolar2->label;
-		
-		dolar->tmp = (*tab)[dolar2->label].tmp;
-		dolar->label = (*tab)[dolar2->label].label;
-		dolar->traducao = dolar4->traducao + "\t" + (*tab)[dolar2->label].tmp + " = " + "(" + tipo + ") " + dolar4->tmp + ";\n";
-
-		//Gerando variaveis globais
-		declaraVariaveisGlobais += (*tab)[dolar2->label].tipo + " " + (*tab)[dolar2->label].tmp + ";\n";
-	}	
-	else
-	{
-		(*tab)[dolar2->label].tmp =  geraTemp(dolar1->tipo, GLOBAL);
-		(*tab)[dolar2->label].tipo = dolar1->tipo;
-		(*tab)[dolar2->label].label = dolar2->label;
-
-		dolar->tmp = (*tab)[dolar2->label].tmp;
-		dolar->label = (*tab)[dolar2->label].label;
-		dolar->traducao = dolar4->traducao  + "\t" + (*tab)[dolar2->label].tmp + " = " + dolar4->tmp + ";\n";
-
-		//Gerando variaveis globais
-		declaraVariaveisGlobais += (*tab)[dolar2->label].tipo + " " + (*tab)[dolar2->label].tmp + ";\n";
-	}
-}*/
-
 void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4, int ehGlobal)
 {
 	TABELA * tab = pilhaDeTabelas.front();
@@ -463,7 +432,18 @@ void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar
 		dolar->traducao = dolar4->traducao  + "\t" + (*tab)[dolar2->label].tmp + " = " + dolar4->tmp + ";\n";
 	}
 }
+void processaTK_ID(atributos * dolar, atributos * dolar1, atributos * dolar2, int ehGlobal)
+{
+	TABELA * tab = pilhaDeTabelas.front();
 
+	(*tab)[dolar2->label].tmp =  geraTemp(dolar1->tipo, ehGlobal);
+	(*tab)[dolar2->label].tipo = dolar1->tipo;
+	(*tab)[dolar2->label].label = dolar2->label;
+	dolar->tmp = (*tab)[dolar2->label].tmp;
+	dolar->label = (*tab)[dolar2->label].label;
+	//(*tab)[$$.label] = id;
+	dolar->traducao = "";
+}
 void processaTK_VALOR(atributos * dolar, atributos * dolar1, string tipo)
 {
 	TABELA * tab = pilhaDeTabelas.front();
