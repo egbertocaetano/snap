@@ -27,9 +27,8 @@ ID {LETRA}({LETRA}|{NUM})*
 "float"			{ yylval.tipo = yytext; return TK_TIPO_FLOAT;}
 "string"		{ yylval.tipo = yytext; return TK_TIPO_STRING;}
 "boolean"		{ yylval.tipo = yytext; return TK_TIPO_BOOLEAN;}
-"if"			{ return TK_IF;}
 
-"="			{yylval.operador = yytext; return TK_ATRIBUICAO;}
+"="				{yylval.operador = yytext; return TK_ATRIBUICAO;}
 
 [(){}[\];,]	{ return *yytext; }
 
@@ -37,8 +36,8 @@ ID {LETRA}({LETRA}|{NUM})*
 
 "&&"			{ yylval.operador = yytext; return TK_OPERADOR_RELACIONAL; }
 "||"			{ yylval.operador = yytext; return TK_OPERADOR_RELACIONAL; }
-"<"			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
-">"			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
+"<"				{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
+">"				{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
 "<="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
 ">="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
 "=="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }

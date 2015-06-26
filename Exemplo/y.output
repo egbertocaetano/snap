@@ -1,0 +1,763 @@
+Terminais não utilizados na gramática
+
+   TK_FIM
+   TK_ERROR
+   '+'
+   '-'
+   '*'
+   '/'
+   '='
+
+
+Estado 57 conflitos: 1 de redução/redução
+Estado 59 conflitos: 3 de deslocamento/redução
+Estado 60 conflitos: 3 de deslocamento/redução
+Estado 61 conflitos: 3 de deslocamento/redução
+
+
+Gramática
+
+    0 $accept: START $end
+
+    1 START: ESCOPO_GLOBAL S
+
+    2 S: DECL_GLOBAL ';' MAIN
+    3  | MAIN
+
+    4 MAIN: TK_TIPO_INT TK_MAIN '(' ')' BLOCO
+
+    5 ESCOPO_GLOBAL: /* vazio */
+
+    6 INICIA_ESCOPO: '{'
+
+    7 TERMINA_ESCOPO: '}'
+
+    8 BLOCO: INICIA_ESCOPO COMANDOS TERMINA_ESCOPO
+
+    9 COMANDOS: COMANDO
+   10         | COMANDO COMANDOS
+
+   11 COMANDO: DECLARACAO ';'
+   12        | ATRIBUICAO ';'
+   13        | TK_IF '(' E ')' BLOCO
+
+   14 DECL_GLOBAL: TIPO TK_ID TK_ATRIBUICAO VALOR
+   15            | TIPO TK_ID
+
+   16 DECLARACAO: TIPO TK_ID TK_ATRIBUICAO VALOR
+   17           | TIPO TK_ID TK_ATRIBUICAO E
+   18           | TIPO TK_ID
+
+   19 ATRIBUICAO: TK_ID TK_ATRIBUICAO E
+
+   20 E: '(' E ')'
+   21  | E TK_OPERADOR_MATEMATICO E
+   22  | E TK_OPERADOR_RELACIONAL E
+   23  | E TK_OPERADOR_LOGICO E
+   24  | VALOR
+   25  | TK_ID
+
+   26 TIPO: TK_TIPO_INT
+   27     | TK_TIPO_CHAR
+   28     | TK_TIPO_FLOAT
+   29     | TK_TIPO_STRING
+   30     | TK_TIPO_BOOLEAN
+
+   31 VALOR: TK_NUM
+   32      | TK_REAL
+   33      | TK_CHAR
+   34      | TK_VALOR_LOGICO
+
+
+Terminais, com as regras onde eles aparecem
+
+$end (0) 0
+'(' (40) 4 13 20
+')' (41) 4 13 20
+'*' (42)
+'+' (43)
+'-' (45)
+'/' (47)
+';' (59) 2 11 12
+'=' (61)
+'{' (123) 6
+'}' (125) 7
+error (256)
+TK_NUM (258) 31
+TK_REAL (259) 32
+TK_VALOR_LOGICO (260) 34
+TK_CHAR (261) 33
+TK_MAIN (262) 4
+TK_ID (263) 14 15 16 17 18 19 25
+TK_IF (264) 13
+TK_FIM (265)
+TK_ERROR (266)
+TK_OPERADOR_LOGICO (267) 23
+TK_OPERADOR_RELACIONAL (268) 22
+TK_OPERADOR_MATEMATICO (269) 21
+TK_ATRIBUICAO (270) 14 16 17 19
+TK_TIPO_INT (271) 4 26
+TK_TIPO_CHAR (272) 27
+TK_TIPO_FLOAT (273) 28
+TK_TIPO_STRING (274) 29
+TK_TIPO_BOOLEAN (275) 30
+
+
+Não-terminais com as regras onde eles aparecem
+
+$accept (31)
+    à esquerda: 0
+START (32)
+    à esquerda: 1, à direita: 0
+S (33)
+    à esquerda: 2 3, à direita: 1
+MAIN (34)
+    à esquerda: 4, à direita: 2 3
+ESCOPO_GLOBAL (35)
+    à esquerda: 5, à direita: 1
+INICIA_ESCOPO (36)
+    à esquerda: 6, à direita: 8
+TERMINA_ESCOPO (37)
+    à esquerda: 7, à direita: 8
+BLOCO (38)
+    à esquerda: 8, à direita: 4 13
+COMANDOS (39)
+    à esquerda: 9 10, à direita: 8 10
+COMANDO (40)
+    à esquerda: 11 12 13, à direita: 9 10
+DECL_GLOBAL (41)
+    à esquerda: 14 15, à direita: 2
+DECLARACAO (42)
+    à esquerda: 16 17 18, à direita: 11
+ATRIBUICAO (43)
+    à esquerda: 19, à direita: 12
+E (44)
+    à esquerda: 20 21 22 23 24 25, à direita: 13 17 19 20 21 22 23
+TIPO (45)
+    à esquerda: 26 27 28 29 30, à direita: 14 15 16 17 18
+VALOR (46)
+    à esquerda: 31 32 33 34, à direita: 14 16 24
+
+
+estado 0
+
+    0 $accept: . START $end
+
+    $padrão  reduzir usando a regra 5 (ESCOPO_GLOBAL)
+
+    START          ir ao estado 1
+    ESCOPO_GLOBAL  ir ao estado 2
+
+
+estado 1
+
+    0 $accept: START . $end
+
+    $end  deslocar, e ir ao estado 3
+
+
+estado 2
+
+    1 START: ESCOPO_GLOBAL . S
+
+    TK_TIPO_INT      deslocar, e ir ao estado 4
+    TK_TIPO_CHAR     deslocar, e ir ao estado 5
+    TK_TIPO_FLOAT    deslocar, e ir ao estado 6
+    TK_TIPO_STRING   deslocar, e ir ao estado 7
+    TK_TIPO_BOOLEAN  deslocar, e ir ao estado 8
+
+    S            ir ao estado 9
+    MAIN         ir ao estado 10
+    DECL_GLOBAL  ir ao estado 11
+    TIPO         ir ao estado 12
+
+
+estado 3
+
+    0 $accept: START $end .
+
+    $padrão  aceitar
+
+
+estado 4
+
+    4 MAIN: TK_TIPO_INT . TK_MAIN '(' ')' BLOCO
+   26 TIPO: TK_TIPO_INT .
+
+    TK_MAIN  deslocar, e ir ao estado 13
+
+    $padrão  reduzir usando a regra 26 (TIPO)
+
+
+estado 5
+
+   27 TIPO: TK_TIPO_CHAR .
+
+    $padrão  reduzir usando a regra 27 (TIPO)
+
+
+estado 6
+
+   28 TIPO: TK_TIPO_FLOAT .
+
+    $padrão  reduzir usando a regra 28 (TIPO)
+
+
+estado 7
+
+   29 TIPO: TK_TIPO_STRING .
+
+    $padrão  reduzir usando a regra 29 (TIPO)
+
+
+estado 8
+
+   30 TIPO: TK_TIPO_BOOLEAN .
+
+    $padrão  reduzir usando a regra 30 (TIPO)
+
+
+estado 9
+
+    1 START: ESCOPO_GLOBAL S .
+
+    $padrão  reduzir usando a regra 1 (START)
+
+
+estado 10
+
+    3 S: MAIN .
+
+    $padrão  reduzir usando a regra 3 (S)
+
+
+estado 11
+
+    2 S: DECL_GLOBAL . ';' MAIN
+
+    ';'  deslocar, e ir ao estado 14
+
+
+estado 12
+
+   14 DECL_GLOBAL: TIPO . TK_ID TK_ATRIBUICAO VALOR
+   15            | TIPO . TK_ID
+
+    TK_ID  deslocar, e ir ao estado 15
+
+
+estado 13
+
+    4 MAIN: TK_TIPO_INT TK_MAIN . '(' ')' BLOCO
+
+    '('  deslocar, e ir ao estado 16
+
+
+estado 14
+
+    2 S: DECL_GLOBAL ';' . MAIN
+
+    TK_TIPO_INT  deslocar, e ir ao estado 17
+
+    MAIN  ir ao estado 18
+
+
+estado 15
+
+   14 DECL_GLOBAL: TIPO TK_ID . TK_ATRIBUICAO VALOR
+   15            | TIPO TK_ID .
+
+    TK_ATRIBUICAO  deslocar, e ir ao estado 19
+
+    $padrão  reduzir usando a regra 15 (DECL_GLOBAL)
+
+
+estado 16
+
+    4 MAIN: TK_TIPO_INT TK_MAIN '(' . ')' BLOCO
+
+    ')'  deslocar, e ir ao estado 20
+
+
+estado 17
+
+    4 MAIN: TK_TIPO_INT . TK_MAIN '(' ')' BLOCO
+
+    TK_MAIN  deslocar, e ir ao estado 13
+
+
+estado 18
+
+    2 S: DECL_GLOBAL ';' MAIN .
+
+    $padrão  reduzir usando a regra 2 (S)
+
+
+estado 19
+
+   14 DECL_GLOBAL: TIPO TK_ID TK_ATRIBUICAO . VALOR
+
+    TK_NUM           deslocar, e ir ao estado 21
+    TK_REAL          deslocar, e ir ao estado 22
+    TK_VALOR_LOGICO  deslocar, e ir ao estado 23
+    TK_CHAR          deslocar, e ir ao estado 24
+
+    VALOR  ir ao estado 25
+
+
+estado 20
+
+    4 MAIN: TK_TIPO_INT TK_MAIN '(' ')' . BLOCO
+
+    '{'  deslocar, e ir ao estado 26
+
+    INICIA_ESCOPO  ir ao estado 27
+    BLOCO          ir ao estado 28
+
+
+estado 21
+
+   31 VALOR: TK_NUM .
+
+    $padrão  reduzir usando a regra 31 (VALOR)
+
+
+estado 22
+
+   32 VALOR: TK_REAL .
+
+    $padrão  reduzir usando a regra 32 (VALOR)
+
+
+estado 23
+
+   34 VALOR: TK_VALOR_LOGICO .
+
+    $padrão  reduzir usando a regra 34 (VALOR)
+
+
+estado 24
+
+   33 VALOR: TK_CHAR .
+
+    $padrão  reduzir usando a regra 33 (VALOR)
+
+
+estado 25
+
+   14 DECL_GLOBAL: TIPO TK_ID TK_ATRIBUICAO VALOR .
+
+    $padrão  reduzir usando a regra 14 (DECL_GLOBAL)
+
+
+estado 26
+
+    6 INICIA_ESCOPO: '{' .
+
+    $padrão  reduzir usando a regra 6 (INICIA_ESCOPO)
+
+
+estado 27
+
+    8 BLOCO: INICIA_ESCOPO . COMANDOS TERMINA_ESCOPO
+
+    TK_ID            deslocar, e ir ao estado 29
+    TK_IF            deslocar, e ir ao estado 30
+    TK_TIPO_INT      deslocar, e ir ao estado 31
+    TK_TIPO_CHAR     deslocar, e ir ao estado 5
+    TK_TIPO_FLOAT    deslocar, e ir ao estado 6
+    TK_TIPO_STRING   deslocar, e ir ao estado 7
+    TK_TIPO_BOOLEAN  deslocar, e ir ao estado 8
+
+    COMANDOS    ir ao estado 32
+    COMANDO     ir ao estado 33
+    DECLARACAO  ir ao estado 34
+    ATRIBUICAO  ir ao estado 35
+    TIPO        ir ao estado 36
+
+
+estado 28
+
+    4 MAIN: TK_TIPO_INT TK_MAIN '(' ')' BLOCO .
+
+    $padrão  reduzir usando a regra 4 (MAIN)
+
+
+estado 29
+
+   19 ATRIBUICAO: TK_ID . TK_ATRIBUICAO E
+
+    TK_ATRIBUICAO  deslocar, e ir ao estado 37
+
+
+estado 30
+
+   13 COMANDO: TK_IF . '(' E ')' BLOCO
+
+    '('  deslocar, e ir ao estado 38
+
+
+estado 31
+
+   26 TIPO: TK_TIPO_INT .
+
+    $padrão  reduzir usando a regra 26 (TIPO)
+
+
+estado 32
+
+    8 BLOCO: INICIA_ESCOPO COMANDOS . TERMINA_ESCOPO
+
+    '}'  deslocar, e ir ao estado 39
+
+    TERMINA_ESCOPO  ir ao estado 40
+
+
+estado 33
+
+    9 COMANDOS: COMANDO .
+   10         | COMANDO . COMANDOS
+
+    TK_ID            deslocar, e ir ao estado 29
+    TK_IF            deslocar, e ir ao estado 30
+    TK_TIPO_INT      deslocar, e ir ao estado 31
+    TK_TIPO_CHAR     deslocar, e ir ao estado 5
+    TK_TIPO_FLOAT    deslocar, e ir ao estado 6
+    TK_TIPO_STRING   deslocar, e ir ao estado 7
+    TK_TIPO_BOOLEAN  deslocar, e ir ao estado 8
+
+    $padrão  reduzir usando a regra 9 (COMANDOS)
+
+    COMANDOS    ir ao estado 41
+    COMANDO     ir ao estado 33
+    DECLARACAO  ir ao estado 34
+    ATRIBUICAO  ir ao estado 35
+    TIPO        ir ao estado 36
+
+
+estado 34
+
+   11 COMANDO: DECLARACAO . ';'
+
+    ';'  deslocar, e ir ao estado 42
+
+
+estado 35
+
+   12 COMANDO: ATRIBUICAO . ';'
+
+    ';'  deslocar, e ir ao estado 43
+
+
+estado 36
+
+   16 DECLARACAO: TIPO . TK_ID TK_ATRIBUICAO VALOR
+   17           | TIPO . TK_ID TK_ATRIBUICAO E
+   18           | TIPO . TK_ID
+
+    TK_ID  deslocar, e ir ao estado 44
+
+
+estado 37
+
+   19 ATRIBUICAO: TK_ID TK_ATRIBUICAO . E
+
+    TK_NUM           deslocar, e ir ao estado 21
+    TK_REAL          deslocar, e ir ao estado 22
+    TK_VALOR_LOGICO  deslocar, e ir ao estado 23
+    TK_CHAR          deslocar, e ir ao estado 24
+    TK_ID            deslocar, e ir ao estado 45
+    '('              deslocar, e ir ao estado 46
+
+    E      ir ao estado 47
+    VALOR  ir ao estado 48
+
+
+estado 38
+
+   13 COMANDO: TK_IF '(' . E ')' BLOCO
+
+    TK_NUM           deslocar, e ir ao estado 21
+    TK_REAL          deslocar, e ir ao estado 22
+    TK_VALOR_LOGICO  deslocar, e ir ao estado 23
+    TK_CHAR          deslocar, e ir ao estado 24
+    TK_ID            deslocar, e ir ao estado 45
+    '('              deslocar, e ir ao estado 46
+
+    E      ir ao estado 49
+    VALOR  ir ao estado 48
+
+
+estado 39
+
+    7 TERMINA_ESCOPO: '}' .
+
+    $padrão  reduzir usando a regra 7 (TERMINA_ESCOPO)
+
+
+estado 40
+
+    8 BLOCO: INICIA_ESCOPO COMANDOS TERMINA_ESCOPO .
+
+    $padrão  reduzir usando a regra 8 (BLOCO)
+
+
+estado 41
+
+   10 COMANDOS: COMANDO COMANDOS .
+
+    $padrão  reduzir usando a regra 10 (COMANDOS)
+
+
+estado 42
+
+   11 COMANDO: DECLARACAO ';' .
+
+    $padrão  reduzir usando a regra 11 (COMANDO)
+
+
+estado 43
+
+   12 COMANDO: ATRIBUICAO ';' .
+
+    $padrão  reduzir usando a regra 12 (COMANDO)
+
+
+estado 44
+
+   16 DECLARACAO: TIPO TK_ID . TK_ATRIBUICAO VALOR
+   17           | TIPO TK_ID . TK_ATRIBUICAO E
+   18           | TIPO TK_ID .
+
+    TK_ATRIBUICAO  deslocar, e ir ao estado 50
+
+    $padrão  reduzir usando a regra 18 (DECLARACAO)
+
+
+estado 45
+
+   25 E: TK_ID .
+
+    $padrão  reduzir usando a regra 25 (E)
+
+
+estado 46
+
+   20 E: '(' . E ')'
+
+    TK_NUM           deslocar, e ir ao estado 21
+    TK_REAL          deslocar, e ir ao estado 22
+    TK_VALOR_LOGICO  deslocar, e ir ao estado 23
+    TK_CHAR          deslocar, e ir ao estado 24
+    TK_ID            deslocar, e ir ao estado 45
+    '('              deslocar, e ir ao estado 46
+
+    E      ir ao estado 51
+    VALOR  ir ao estado 48
+
+
+estado 47
+
+   19 ATRIBUICAO: TK_ID TK_ATRIBUICAO E .
+   21 E: E . TK_OPERADOR_MATEMATICO E
+   22  | E . TK_OPERADOR_RELACIONAL E
+   23  | E . TK_OPERADOR_LOGICO E
+
+    TK_OPERADOR_LOGICO      deslocar, e ir ao estado 52
+    TK_OPERADOR_RELACIONAL  deslocar, e ir ao estado 53
+    TK_OPERADOR_MATEMATICO  deslocar, e ir ao estado 54
+
+    $padrão  reduzir usando a regra 19 (ATRIBUICAO)
+
+
+estado 48
+
+   24 E: VALOR .
+
+    $padrão  reduzir usando a regra 24 (E)
+
+
+estado 49
+
+   13 COMANDO: TK_IF '(' E . ')' BLOCO
+   21 E: E . TK_OPERADOR_MATEMATICO E
+   22  | E . TK_OPERADOR_RELACIONAL E
+   23  | E . TK_OPERADOR_LOGICO E
+
+    TK_OPERADOR_LOGICO      deslocar, e ir ao estado 52
+    TK_OPERADOR_RELACIONAL  deslocar, e ir ao estado 53
+    TK_OPERADOR_MATEMATICO  deslocar, e ir ao estado 54
+    ')'                     deslocar, e ir ao estado 55
+
+
+estado 50
+
+   16 DECLARACAO: TIPO TK_ID TK_ATRIBUICAO . VALOR
+   17           | TIPO TK_ID TK_ATRIBUICAO . E
+
+    TK_NUM           deslocar, e ir ao estado 21
+    TK_REAL          deslocar, e ir ao estado 22
+    TK_VALOR_LOGICO  deslocar, e ir ao estado 23
+    TK_CHAR          deslocar, e ir ao estado 24
+    TK_ID            deslocar, e ir ao estado 45
+    '('              deslocar, e ir ao estado 46
+
+    E      ir ao estado 56
+    VALOR  ir ao estado 57
+
+
+estado 51
+
+   20 E: '(' E . ')'
+   21  | E . TK_OPERADOR_MATEMATICO E
+   22  | E . TK_OPERADOR_RELACIONAL E
+   23  | E . TK_OPERADOR_LOGICO E
+
+    TK_OPERADOR_LOGICO      deslocar, e ir ao estado 52
+    TK_OPERADOR_RELACIONAL  deslocar, e ir ao estado 53
+    TK_OPERADOR_MATEMATICO  deslocar, e ir ao estado 54
+    ')'                     deslocar, e ir ao estado 58
+
+
+estado 52
+
+   23 E: E TK_OPERADOR_LOGICO . E
+
+    TK_NUM           deslocar, e ir ao estado 21
+    TK_REAL          deslocar, e ir ao estado 22
+    TK_VALOR_LOGICO  deslocar, e ir ao estado 23
+    TK_CHAR          deslocar, e ir ao estado 24
+    TK_ID            deslocar, e ir ao estado 45
+    '('              deslocar, e ir ao estado 46
+
+    E      ir ao estado 59
+    VALOR  ir ao estado 48
+
+
+estado 53
+
+   22 E: E TK_OPERADOR_RELACIONAL . E
+
+    TK_NUM           deslocar, e ir ao estado 21
+    TK_REAL          deslocar, e ir ao estado 22
+    TK_VALOR_LOGICO  deslocar, e ir ao estado 23
+    TK_CHAR          deslocar, e ir ao estado 24
+    TK_ID            deslocar, e ir ao estado 45
+    '('              deslocar, e ir ao estado 46
+
+    E      ir ao estado 60
+    VALOR  ir ao estado 48
+
+
+estado 54
+
+   21 E: E TK_OPERADOR_MATEMATICO . E
+
+    TK_NUM           deslocar, e ir ao estado 21
+    TK_REAL          deslocar, e ir ao estado 22
+    TK_VALOR_LOGICO  deslocar, e ir ao estado 23
+    TK_CHAR          deslocar, e ir ao estado 24
+    TK_ID            deslocar, e ir ao estado 45
+    '('              deslocar, e ir ao estado 46
+
+    E      ir ao estado 61
+    VALOR  ir ao estado 48
+
+
+estado 55
+
+   13 COMANDO: TK_IF '(' E ')' . BLOCO
+
+    '{'  deslocar, e ir ao estado 26
+
+    INICIA_ESCOPO  ir ao estado 27
+    BLOCO          ir ao estado 62
+
+
+estado 56
+
+   17 DECLARACAO: TIPO TK_ID TK_ATRIBUICAO E .
+   21 E: E . TK_OPERADOR_MATEMATICO E
+   22  | E . TK_OPERADOR_RELACIONAL E
+   23  | E . TK_OPERADOR_LOGICO E
+
+    TK_OPERADOR_LOGICO      deslocar, e ir ao estado 52
+    TK_OPERADOR_RELACIONAL  deslocar, e ir ao estado 53
+    TK_OPERADOR_MATEMATICO  deslocar, e ir ao estado 54
+
+    $padrão  reduzir usando a regra 17 (DECLARACAO)
+
+
+estado 57
+
+   16 DECLARACAO: TIPO TK_ID TK_ATRIBUICAO VALOR .
+   24 E: VALOR .
+
+    ';'       reduzir usando a regra 16 (DECLARACAO)
+    ';'       [reduzir usando a regra 24 (E)]
+    $padrão  reduzir usando a regra 24 (E)
+
+
+estado 58
+
+   20 E: '(' E ')' .
+
+    $padrão  reduzir usando a regra 20 (E)
+
+
+estado 59
+
+   21 E: E . TK_OPERADOR_MATEMATICO E
+   22  | E . TK_OPERADOR_RELACIONAL E
+   23  | E . TK_OPERADOR_LOGICO E
+   23  | E TK_OPERADOR_LOGICO E .
+
+    TK_OPERADOR_LOGICO      deslocar, e ir ao estado 52
+    TK_OPERADOR_RELACIONAL  deslocar, e ir ao estado 53
+    TK_OPERADOR_MATEMATICO  deslocar, e ir ao estado 54
+
+    TK_OPERADOR_LOGICO      [reduzir usando a regra 23 (E)]
+    TK_OPERADOR_RELACIONAL  [reduzir usando a regra 23 (E)]
+    TK_OPERADOR_MATEMATICO  [reduzir usando a regra 23 (E)]
+    $padrão                reduzir usando a regra 23 (E)
+
+
+estado 60
+
+   21 E: E . TK_OPERADOR_MATEMATICO E
+   22  | E . TK_OPERADOR_RELACIONAL E
+   22  | E TK_OPERADOR_RELACIONAL E .
+   23  | E . TK_OPERADOR_LOGICO E
+
+    TK_OPERADOR_LOGICO      deslocar, e ir ao estado 52
+    TK_OPERADOR_RELACIONAL  deslocar, e ir ao estado 53
+    TK_OPERADOR_MATEMATICO  deslocar, e ir ao estado 54
+
+    TK_OPERADOR_LOGICO      [reduzir usando a regra 22 (E)]
+    TK_OPERADOR_RELACIONAL  [reduzir usando a regra 22 (E)]
+    TK_OPERADOR_MATEMATICO  [reduzir usando a regra 22 (E)]
+    $padrão                reduzir usando a regra 22 (E)
+
+
+estado 61
+
+   21 E: E . TK_OPERADOR_MATEMATICO E
+   21  | E TK_OPERADOR_MATEMATICO E .
+   22  | E . TK_OPERADOR_RELACIONAL E
+   23  | E . TK_OPERADOR_LOGICO E
+
+    TK_OPERADOR_LOGICO      deslocar, e ir ao estado 52
+    TK_OPERADOR_RELACIONAL  deslocar, e ir ao estado 53
+    TK_OPERADOR_MATEMATICO  deslocar, e ir ao estado 54
+
+    TK_OPERADOR_LOGICO      [reduzir usando a regra 21 (E)]
+    TK_OPERADOR_RELACIONAL  [reduzir usando a regra 21 (E)]
+    TK_OPERADOR_MATEMATICO  [reduzir usando a regra 21 (E)]
+    $padrão                reduzir usando a regra 21 (E)
+
+
+estado 62
+
+   13 COMANDO: TK_IF '(' E ')' BLOCO .
+
+    $padrão  reduzir usando a regra 13 (COMANDO)

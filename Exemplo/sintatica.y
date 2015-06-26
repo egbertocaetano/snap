@@ -30,6 +30,9 @@ typedef map<string , atributos>::iterator ITERATOR;
 #define GLOBAL 1
 #define LOCAL 0
 
+#define TRUE 1
+#define FALSE 0
+
 //Declarações de protótipos de funções
 int yylex(void);
 void yyerror(string);
@@ -40,7 +43,7 @@ string getTipo(string operacao);
 map<string, string> criaTabTipoRetorno();
 //void declaracoes();/*Essa função cria uma string que ira declarar as variaveis que serão utilizadas durante a execução do código*/
 void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3, atributos * dolar4, int ehGlobal);
-void processaTK_ATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3);
+void processaATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3);
 void processaTK_VALOR(atributos * dolar, atributos * dolar1, string tipo);
 void processaTK_ID(atributos * dolar, atributos * dolar1, atributos * dolar2, int ehGlobal);
 void operacaoAritmetica(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3);
@@ -60,7 +63,7 @@ list<TABELA*> pilhaDeTabelas;
 %}
 
 %token TK_NUM TK_REAL TK_VALOR_LOGICO TK_CHAR
-%token TK_MAIN TK_ID
+%token TK_MAIN TK_ID TK_IF
 %token TK_FIM TK_ERROR
 %token TK_OPERADOR_LOGICO TK_OPERADOR_RELACIONAL TK_OPERADOR_MATEMATICO TK_ATRIBUICAO
 %token TK_TIPO_INT TK_TIPO_CHAR TK_TIPO_FLOAT TK_TIPO_STRING TK_TIPO_BOOLEAN
@@ -134,7 +137,15 @@ COMANDOS	: COMANDO
 
 COMANDO 	: DECLARACAO ';'
 			| ATRIBUICAO ';'
+			| TK_IF '(' E ')' BLOCO
+			{
+				//Antes fazer verificação se $3 é do tipo booleano
+				$$.traducao= "\n" + $3.traducao + "\n\t" + "if(!" + $3.tmp + ")goto FIM_IF\n" + $5.traducao + "\n\tFIM_IF:\n";
+
+			}
 			;
+
+
 
 DECL_GLOBAL : TIPO TK_ID TK_ATRIBUICAO VALOR
 			{
@@ -143,18 +154,6 @@ DECL_GLOBAL : TIPO TK_ID TK_ATRIBUICAO VALOR
 			|TIPO TK_ID
 			{
 				processaTK_ID(&$$, &$1, &$2, GLOBAL);
-/*				TABELA * tab = pilhaDeTabelas.front();
-
-				atributos id;
-				id.tmp =  geraTemp($1.tipo, GLOBAL);
-				id.tipo = $1.tipo;
-				id.label = $2.label;
-				$$.tmp = id.tmp;
-				$$.label = id.label;
-				tabLabel[$$.label] = id;
-				(*tab)[$$.label] = id;
-				$$.traducao = "";*/
-				//$$.traducao = "\t" + tabLabel[$$.label].tipo + " "  + $$.tmp + ";\n";
 			};
 
 DECLARACAO	:TIPO TK_ID TK_ATRIBUICAO VALOR
@@ -172,40 +171,13 @@ DECLARACAO	:TIPO TK_ID TK_ATRIBUICAO VALOR
 			|TIPO TK_ID
 			{
 				 processaTK_ID(&$$, &$1, &$2, LOCAL);
-
-				/*TABELA * tab = pilhaDeTabelas.front();
-
-				atributos id;
-				id.tmp =  geraTemp($1.tipo, LOCAL);
-				id.tipo = $1.tipo;
-				id.label = $2.label;
-				$$.tmp = id.tmp;
-				$$.label = id.label;
-				tabLabel[$$.label] = id;
-				(*tab)[$$.label] = id;
-				$$.traducao = "";*/
-				//$$.traducao = "\t" + tabLabel[$$.label].tipo + " "  + $$.tmp + ";\n";
 			};
 
 ATRIBUICAO	: TK_ID TK_ATRIBUICAO E
 			{	
 				//Nessa parte precisa verificar se TK_ID pertence ao contexto atual
-				//processaTK_ATRIBUICAO(&$$, &$1, &$2, &$3, &$4);
-				TABELA * tab = existeID($1.label);
-				if(tab != NULL)
-				{
-					//Verificando tipo das variaveis para decidir o tipo da nova variavel temporaria 
-					if($1.tipo != $3.tipo)
-					{	
-						string tipo = getTipo((*tab)[$1.label].tipo + $2.operador + $3.tipo);	
-						$$.traducao = $1.traducao + $3.traducao + "\t" + (*tab)[$1.label].tmp + " = " + "(" + tipo + ") " + $3.tmp + ";\n";
-					}	
-					else 
-					{
-						$$.traducao = $1.traducao + $3.traducao + "\t" + (*tab)[$1.label].tmp + " = " + $3.tmp + ";\n";
-					}
-					
-				}	
+				processaATRIBUICAO(&$$, &$1, &$2, &$3);
+
 			}
 			;
 
@@ -242,12 +214,18 @@ E 			:'(' E ')'
 				if($1.tipo != $3.tipo)
 				{
 					string tipo = getTipo($1.tipo +  $2.operador + $3.tipo);
+					if(tipo == "boolean")
+						tipo = "int";
+
 					$$.tmp = geraTemp(tipo, LOCAL);
 					$$.tipo = tipo;	
 					$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";
 				}	
 				else
 				{
+					if($1.tipo == "boolean")
+					 $1.tipo = "int";
+
 					$$.tmp = geraTemp($1.tipo, LOCAL);
 					$$.tipo = $1.tipo;	
 					$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";	
@@ -285,7 +263,12 @@ VALOR 		: TK_NUM
 				processaTK_VALOR(&$$, &$1, "char");
 			}
 			|TK_VALOR_LOGICO
-			{
+			{	
+				if($1.valor == "TRUE")
+					$1.valor = "1";
+				else
+					$1.valor = "0";
+				 
 				processaTK_VALOR(&$$, &$1, "boolean");
 			}
 			;			
@@ -373,7 +356,8 @@ string getTipo(string operacao)
 
 	return tipo;
 }
-void processaTK_ATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3)
+
+void processaATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3)
 {
 
 	TABELA * tab1 = existeID(dolar1->label);
@@ -408,10 +392,15 @@ void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar
 {
 	TABELA * tab = pilhaDeTabelas.front();
 
+	
+
 	//Verificando tipo para ver a necessidade de cast
 	if(dolar1->tipo != dolar4->tipo)
 	{	
 		string tipo = getTipo(dolar1->tipo + dolar3->operador + dolar4->tipo);
+
+		if(tipo == "boolean")
+			tipo = "int";
 
 		(*tab)[dolar2->label].tmp =  geraTemp(tipo, ehGlobal);
 		(*tab)[dolar2->label].tipo = dolar1->tipo;
@@ -423,6 +412,9 @@ void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar
 	}	
 	else
 	{
+		if(dolar1->tipo == "boolean")
+			dolar1->tipo = "int";
+
 		(*tab)[dolar2->label].tmp =  geraTemp(dolar1->tipo, ehGlobal);
 		(*tab)[dolar2->label].tipo = dolar1->tipo;
 		(*tab)[dolar2->label].label = dolar2->label;
@@ -432,9 +424,13 @@ void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar
 		dolar->traducao = dolar4->traducao  + "\t" + (*tab)[dolar2->label].tmp + " = " + dolar4->tmp + ";\n";
 	}
 }
+
 void processaTK_ID(atributos * dolar, atributos * dolar1, atributos * dolar2, int ehGlobal)
 {
 	TABELA * tab = pilhaDeTabelas.front();
+
+	if( dolar1->tipo == "boolean")
+		dolar1->tipo = "int";
 
 	(*tab)[dolar2->label].tmp =  geraTemp(dolar1->tipo, ehGlobal);
 	(*tab)[dolar2->label].tipo = dolar1->tipo;
@@ -444,10 +440,13 @@ void processaTK_ID(atributos * dolar, atributos * dolar1, atributos * dolar2, in
 	//(*tab)[$$.label] = id;
 	dolar->traducao = "";
 }
+
 void processaTK_VALOR(atributos * dolar, atributos * dolar1, string tipo)
 {
 	TABELA * tab = pilhaDeTabelas.front();
 
+	if( tipo == "boolean")
+		tipo = "int";
 	atributos id;
 	id.tmp =  geraTemp(tipo, LOCAL);
 	id.label = id.tmp;
@@ -484,6 +483,7 @@ void operacaoAritmetica(atributos * dolar, atributos * dolar1, atributos * dolar
 		(*tab)[id.label] = id;
 	}
 }
+
 void castTemp(atributos * dolar, atributos * dolar1, atributos* dolar2, atributos* dolar3,  string tipo)
 {
 	atributos castT;

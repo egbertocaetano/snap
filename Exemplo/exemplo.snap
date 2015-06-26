@@ -6,4 +6,9 @@ int main()
 	int a = b + 4;
 	boolean c = TRUE;
 	c = 5.0<3;
+	
+	if(c=="TRUE")
+	{
+		int te = 10;
+	}
 }

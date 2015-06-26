@@ -1,7 +1,7 @@
 all: 	
 		clear
 		lex lexica.l
-		yacc -d sintatica.y
+		yacc -dv sintatica.y
 		g++ -o snp y.tab.c -lfl
 
 		./snp < exemplo.snap
