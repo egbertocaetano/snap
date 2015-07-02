@@ -28,6 +28,11 @@ ID {LETRA}({LETRA}|{NUM})*
 "string"		{ yylval.tipo = yytext; return TK_TIPO_STRING;}
 "boolean"		{ yylval.tipo = yytext; return TK_TIPO_BOOLEAN;}
 "if"			{ return TK_IF;}
+"else"			{ return TK_ELSE;}
+"for"			{ return TK_FOR;}
+"while"			{ return TK_WHILE;}
+"do"            { return TK_DO;}
+
 
 "="			{yylval.operador = yytext; return TK_ATRIBUICAO;}
 
@@ -43,7 +48,8 @@ ID {LETRA}({LETRA}|{NUM})*
 ">="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
 "=="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
 "!="			{ yylval.operador = yytext; return TK_OPERADOR_LOGICO; }
-
+"++"            { yylval.operador = yytext; return TK_OPERADOR_CREMENTO; }
+"--"            { yylval.operador = yytext; return TK_OPERADOR_CREMENTO; }
 
 {NUM}		{ yylval.valor = yytext; yylval.tipo = "int"; return TK_NUM; }
 {REAL}		{ yylval.valor = yytext; yylval.tipo = "float"; return TK_REAL; }

@@ -47,6 +47,7 @@ void processaATRIBUICAO(atributos * dolar, atributos * dolar1, atributos * dolar
 void processaTK_VALOR(atributos * dolar, atributos * dolar1, string tipo);
 void processaTK_ID(atributos * dolar, atributos * dolar1, atributos * dolar2, int ehGlobal);
 void operacaoAritmetica(atributos * dolar, atributos * dolar1, atributos * dolar2, atributos * dolar3);
+void traducaoOpAritmeticaIncDec(atributos* dolar, atributos* dolar1, atributos* dolar2);
 void castTemp(atributos * dolar, atributos * dolar1, atributos* dolar2, atributos* dolar3, string tipo);
 void iniciaEscopo();
 void terminaEscopo();
@@ -63,9 +64,9 @@ list<TABELA*> pilhaDeTabelas;
 %}
 
 %token TK_NUM TK_REAL TK_VALOR_LOGICO TK_CHAR
-%token TK_MAIN TK_ID TK_IF TK_ELSE
+%token TK_MAIN TK_ID TK_IF TK_ELSE TK_FOR TK_WHILE TK_DO
 %token TK_FIM TK_ERROR
-%token TK_OPERADOR_LOGICO TK_OPERADOR_RELACIONAL TK_OPERADOR_MATEMATICO TK_ATRIBUICAO
+%token TK_OPERADOR_LOGICO TK_OPERADOR_RELACIONAL TK_OPERADOR_MATEMATICO TK_ATRIBUICAO TK_OPERADOR_CREMENTO
 %token TK_TIPO_INT TK_TIPO_CHAR TK_TIPO_FLOAT TK_TIPO_STRING TK_TIPO_BOOLEAN
 
 %start START
@@ -140,8 +141,24 @@ COMANDO 	: DECLARACAO ';'
 			}
 			| TK_IF '(' E ')' BLOCO TK_ELSE BLOCO
 			{
+				
 				$$.traducao= "\n" + $3.traducao + "\n\t" + "if(!" + $3.tmp + ")goto ELSE\n" + $5.traducao + "\tgoto FIM_IF\n" 
-							+ "\n\tELSE:\n" + $7.traducao + "\n\tFIM_IF:\n";
+							+ "\n\tELSE:\n" + $7.traducao + "\n\tFIM_IF:\n";				
+			}
+			| TK_WHILE '(' E ')' BLOCO // obs: ve se precisa colocar ; pra fechar  while e do while
+			{
+				$$.traducao= "\n" + $3.traducao + "\n\t" + "LOOP:\n\twhile(!" + $3.tmp + ")goto FIM_WHILE\n" + $5.traducao + "\tgoto LOOP\n"
+				+"\tFIM_WHILE:\n";
+
+			}
+			| TK_DO BLOCO TK_WHILE '(' E ')' ';'
+			{
+				$$.traducao= "\n" + $5.traducao + "\n\t" + "LOOP:\n\tdo\n" + $2.traducao + "\twhile(" + $5.tmp + ")goto LOOP\n";
+			}
+			|  TK_FOR '(' DECLARACAO ';' E ';' TK_ID TK_OPERADOR_CREMENTO ')' BLOCO 
+			{
+				$$.traducao= "\n" + $5.traducao + "\n\t" + "\n" + $3.traducao + "\n\t" "LOOP:\n\tfor(" + $3.tmp + ";" + $5.tmp + ";" + $8.traducao +")"
+				 + $9.traducao + "FIM_FOR"; // corrigir o ++ e -- ta cagado
 			}
 			;
 
@@ -172,7 +189,26 @@ ATRIBUICAO	: TK_ID TK_ATRIBUICAO E
 				//Nessa parte precisa verificar se TK_ID pertence ao contexto atual
 				processaATRIBUICAO(&$$, &$1, &$2, &$3);
 
-			};
+			}
+			| TK_ID TK_OPERADOR_CREMENTO // E ++
+			{
+				traducaoOpAritmeticaIncDec(&$$, &$1, &$2);
+			}
+			| TK_OPERADOR_CREMENTO TK_ID // ++ E
+			{
+				traducaoOpAritmeticaIncDec(&$$, &$2, &$1);
+			}
+			
+			// |TK_ID TK_OPERADOR_CREMENTO
+			// {	
+			// 	//Nessa parte precisa verificar se TK_ID pertence ao contexto atual
+			// 	if ($2.label == "++")
+			// 	{
+			// 		$2.valor = 1 ;
+			// 		$2.tipo = "int" ;
+			// 		operacaoAritmetica(&$$, &$1, "+", &$2);
+			// 	}
+			//};;
 
 E 			:'(' E ')'
 			{
@@ -492,6 +528,30 @@ void operacaoAritmetica(atributos * dolar, atributos * dolar1, atributos * dolar
 		(*tab)[dolar->label].label = dolar->label;
 		(*tab)[dolar->label].tipo = dolar->tipo;
 	}
+}
+
+void traducaoOpAritmeticaIncDec(atributos* dolar, atributos* dolar1,atributos* dolar2)
+{	
+		TABELA * tab = pilhaDeTabelas.front();
+	//Verificando se há necessidade de fazer cast. Caso sim, decidir o tipo da nova variavel temporaria para o cast
+	
+		// dolar->tmp = geraTemp(dolar1->tipo, LOCAL);
+		// dolar->tipo = dolar1->tipo;	
+		//dolar->traducao = dolar1->traducao + dolar2->traducao + "\t" + dolar->tmp + " = " + dolar1->tmp + " + " + dolar2->tmp + ";\n";	
+	
+		if (dolar2->label == "++") { 
+			dolar->traducao = dolar1->traducao + "\t" + dolar->tmp + " = " + dolar1->tmp + " + 1;\n";	
+	
+		}
+		else if (dolar2->label == "--") {
+			dolar->traducao = dolar1->traducao + "\t" + dolar->tmp + " = " + dolar1->tmp + " - 1;\n";	
+		}
+
+		(*tab)[dolar->label].tmp =  dolar->tmp;
+		(*tab)[dolar->label].label = dolar->label;
+		(*tab)[dolar->label].tipo = dolar->tipo;
+		
+	
 }
 
 void castTemp(atributos * dolar, atributos * dolar1, atributos* dolar2, atributos* dolar3,  string tipo)

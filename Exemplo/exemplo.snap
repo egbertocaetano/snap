@@ -2,15 +2,11 @@
 int main()
 {	
 
-	boolean c = TRUE;
-	int te;
+	int a;
+
+	a = 3 ;
+
+	a++;
 	
-	if(c==TRUE)
-	{
-		te = 10.0 + c;
-	}
-	else
-	{
-		te = 20;
-	}
+	
 }
