@@ -85,18 +85,15 @@ START 		: ESCOPO_GLOBAL S
 
 S 			: DECL_GLOBAL ';' MAIN
 			{
-				$$.traducao = "\n" + declaraVariaveisGlobais + "\n" + $1.tipo + " main(void)\n{\n" 
-							  + declaraVariaveis + "\n" 
-							  + $1.traducao 
-							  + $3.traducao 
-							  + "\treturn 0;\n}"; 
+				$$.traducao = "\n" + declaraVariaveisGlobais + $3.traducao; 
+							   
 			}
 			| MAIN;
 
 MAIN        :TK_TIPO_INT TK_MAIN '(' ')' BLOCO
 			{
 
-				$$.traducao = $5.traducao; 
+				$$.traducao = "\n" + $1.tipo + " main(void)\n{\n" + declaraVariaveis + "\n" + $5.traducao + "\treturn 0;\n}"; 
 				
 			}
 			;
@@ -210,24 +207,21 @@ E 			:'(' E ')'
 			}	
 			|E TK_OPERADOR_LOGICO E //Refazer esse operador
 			{
-				//Verificando tipo das variaveis para decidir o tipo da nova variavel temporaria 
+				string tipo;
+				//Verificando tipo das variaveis para decidir o tipo da nova variavel temporaria 			
 				if($1.tipo != $3.tipo)
-				{
-					string tipo = getTipo($1.tipo +  $2.operador + $3.tipo);
-					if(tipo == "boolean")
-						tipo = "int";
-
+				{	
+					tipo = getTipo($1.tipo +  $2.operador + $3.tipo);				
+					//cout << $1.tipo +  $2.operador + $3.tipo<< endl;
 					$$.tmp = geraTemp(tipo, LOCAL);
 					$$.tipo = tipo;	
 					$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";
 				}	
 				else
 				{
-					if($1.tipo == "boolean")
-					 $1.tipo = "int";
-
+					
 					$$.tmp = geraTemp($1.tipo, LOCAL);
-					$$.tipo = $1.tipo;	
+					$$.tipo = tipo;	
 					$$.traducao = $1.traducao + $3.traducao + "\t" + $$.tmp + " = " + $1.tmp + $2.operador + $3.tmp + ";\n";	
 				}
 			}	
@@ -248,7 +242,27 @@ E 			:'(' E ')'
 			}
 			;
 
-TIPO 		: TK_TIPO_INT | TK_TIPO_CHAR | TK_TIPO_FLOAT | TK_TIPO_STRING | TK_TIPO_BOOLEAN;
+TIPO 		: TK_TIPO_INT
+			{
+				$$.tipo = $1.tipo;
+			} 
+			| TK_TIPO_CHAR
+			{
+				$$.tipo = $1.tipo;
+			} 
+			| TK_TIPO_FLOAT 
+			{
+				$$.tipo = $1.tipo;	
+			}
+			| TK_TIPO_STRING
+			{
+				$$.tipo = $1.tipo;	
+			} 
+			| TK_TIPO_BOOLEAN
+			{
+				$$.tipo = "int";
+			}
+			;
 
 VALOR 		: TK_NUM
 			{
@@ -258,7 +272,7 @@ VALOR 		: TK_NUM
 			{
 				processaTK_VALOR(&$$, &$1, "float");
 			}
-			|TK_CHAR
+			| TK_CHAR
 			{
 				processaTK_VALOR(&$$, &$1, "char");
 			}
@@ -269,7 +283,7 @@ VALOR 		: TK_NUM
 				else
 					$1.valor = "0";
 				 
-				processaTK_VALOR(&$$, &$1, "boolean");
+				processaTK_VALOR(&$$, &$1, "int");
 			}
 			;			
 %%
@@ -296,11 +310,15 @@ string geraTemp(string tipo, int ehGlobal){
 	static int i = 0;
 	stringstream ss;
 	ss << "temp" << i++;
-
+ 
 	if(ehGlobal == 1)
+	{
 		declaraVariaveisGlobais += tipo + " " + ss.str() + ";\n";
+	}
 	else
+	{
 		declaraVariaveis += "\t" + tipo + " " + ss.str() + ";\n";
+	}
 	
 
 	return ss.str();
@@ -396,11 +414,13 @@ void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar
 
 	//Verificando tipo para ver a necessidade de cast
 	if(dolar1->tipo != dolar4->tipo)
-	{	
-		string tipo = getTipo(dolar1->tipo + dolar3->operador + dolar4->tipo);
+	{			
+/*		if(dolar1->tipo == "boolean")
+			dolar1->tipo = "int";*/
 
-		if(tipo == "boolean")
-			tipo = "int";
+		//dolar1->tipo = ehBoolean(dolar->tipo);
+
+		string tipo = getTipo(dolar1->tipo + dolar3->operador + dolar4->tipo);
 
 		(*tab)[dolar2->label].tmp =  geraTemp(tipo, ehGlobal);
 		(*tab)[dolar2->label].tipo = dolar1->tipo;
@@ -412,8 +432,10 @@ void processaDECLARACAO(atributos * dolar, atributos * dolar1, atributos * dolar
 	}	
 	else
 	{
-		if(dolar1->tipo == "boolean")
-			dolar1->tipo = "int";
+		/*if(dolar1->tipo == "boolean")
+			dolar1->tipo = "int";*/
+
+		//dolar1->tipo = ehBoolean(dolar->tipo);
 
 		(*tab)[dolar2->label].tmp =  geraTemp(dolar1->tipo, ehGlobal);
 		(*tab)[dolar2->label].tipo = dolar1->tipo;
@@ -429,14 +451,17 @@ void processaTK_ID(atributos * dolar, atributos * dolar1, atributos * dolar2, in
 {
 	TABELA * tab = pilhaDeTabelas.front();
 
-	if( dolar1->tipo == "boolean")
-		dolar1->tipo = "int";
+/*	if( dolar1->tipo == "boolean")
+		dolar1->tipo = "int";*/
+
+	//dolar1->tipo = ehBoolean(dolar->tipo);
 
 	(*tab)[dolar2->label].tmp =  geraTemp(dolar1->tipo, ehGlobal);
 	(*tab)[dolar2->label].tipo = dolar1->tipo;
 	(*tab)[dolar2->label].label = dolar2->label;
 	dolar->tmp = (*tab)[dolar2->label].tmp;
 	dolar->label = (*tab)[dolar2->label].label;
+	dolar->tipo = (*tab)[dolar2->label].tipo;
 	//(*tab)[$$.label] = id;
 	dolar->traducao = "";
 }
@@ -445,8 +470,12 @@ void processaTK_VALOR(atributos * dolar, atributos * dolar1, string tipo)
 {
 	TABELA * tab = pilhaDeTabelas.front();
 
-	if( tipo == "boolean")
-		tipo = "int";
+		
+/*	if( tipo == "boolean")
+	 	tipo = "int";*/
+
+	//tipo = ehBoolean(tipo);
+
 	atributos id;
 	id.tmp =  geraTemp(tipo, LOCAL);
 	id.label = id.tmp;
@@ -454,6 +483,7 @@ void processaTK_VALOR(atributos * dolar, atributos * dolar1, string tipo)
 	id.valor = dolar1->valor;
 	dolar->tmp = id.tmp;
 	dolar->label = id.tmp;
+	dolar->tipo = tipo;
 	(*tab)[dolar->label] = id;
 	dolar->traducao = "\t" + dolar->tmp  + " = " + dolar1->valor + ";\n";
 }
@@ -551,8 +581,8 @@ map<string, string> criaTabTipoRetorno()
     tabela_tipos["float+int"] = "float";
     tabela_tipos["int+string"] = "string";
     tabela_tipos["string+int"] = "string";
-    tabela_tipos["int+char"] = "char"; //Verificar se será esse tipo mesmo para essa operação
-    tabela_tipos["char+int"] = "char";
+    tabela_tipos["int+char"] = "char"; //Feature: Concactena o char com o inteiro
+    tabela_tipos["char+int"] = "char";//Feature: Concactena o char com o inteiro
     tabela_tipos["float+float"] = "float";
     tabela_tipos["float+string"] = "string";
     tabela_tipos["string+float"] = "string";
@@ -567,8 +597,8 @@ map<string, string> criaTabTipoRetorno()
     tabela_tipos["float-int"] = "float";
     tabela_tipos["int-string"] = "string";
     tabela_tipos["string-int"] = "string";
-    tabela_tipos["int-char"] = "char"; //Verificar se será esse tipo mesmo para essa operação
-    tabela_tipos["char-int"] = "char";
+    tabela_tipos["int-char"] = "char"; //ERRO
+    tabela_tipos["char-int"] = "char";//ERRO
     tabela_tipos["float-float"] = "float";
     tabela_tipos["float-string"] = "string";
     tabela_tipos["string-float"] = "string";
@@ -581,13 +611,13 @@ map<string, string> criaTabTipoRetorno()
     tabela_tipos["int*int"] = "int";
     tabela_tipos["int*float"] = "float";
     tabela_tipos["float*int"] = "float";
-    tabela_tipos["int*string"] = "ERRO";
-    tabela_tipos["string*int"] = "ERRO";
-    tabela_tipos["int*char"] = "ERRO"; //Verificar se será esse tipo mesmo para essa operação
-    tabela_tipos["char*int"] = "ERRO";
+    tabela_tipos["int*string"] = "ERRO";//Feature: multiplica string pela quantidade de vezes do inteiro
+    tabela_tipos["string*int"] = "ERRO";//Feature: multiplica string pela quantidade de vezes do inteiro
+    tabela_tipos["int*char"] = "ERRO"; //Feature: Verificar qual tipo de feature pode ser adcionada
+    tabela_tipos["char*int"] = "ERRO";//Feature: Verificar qual tipo de feature pode ser adcionada
     tabela_tipos["float*float"] = "float";
-    tabela_tipos["float*string"] = "ERRO";
-    tabela_tipos["string*float"] = "ERRO";
+    tabela_tipos["float*string"] = "ERRO";//Feature: multiplica string pela quantidade de vezes do float
+    tabela_tipos["string*float"] = "ERRO";//Feature: multiplica string pela quantidade de vezes do float
     tabela_tipos["char*char"] = "ERRO";
     tabela_tipos["char*string"] = "ERRO";
     tabela_tipos["string*char"] = "ERRO";
@@ -610,51 +640,120 @@ map<string, string> criaTabTipoRetorno()
     tabela_tipos["string/string"] = "ERRO";
    
    	
-	// Para operadores relacionais e atribuicao, a tabela da o tipo de cast6  
-    tabela_tipos["float>float"] = "boolean";
-    tabela_tipos["int>int"] = "boolean";
-    tabela_tipos["float>int"] = "boolean";
-    tabela_tipos["char>char"] = "boolean";    
-	tabela_tipos["string>string"] = "boolean"; 
-    tabela_tipos["int>=int"] = "boolean";
-    tabela_tipos["float>=float"] = "boolean";
-    tabela_tipos["float>=int"] = "boolean";
-    tabela_tipos["char>=char"] = "boolean";
-    tabela_tipos["string>=string"] = "boolean"; 
-    
-    tabela_tipos["int<int"] = "boolean";
-    tabela_tipos["float<float"] = "boolean";
-    tabela_tipos["float<int"] = "boolean";
-    tabela_tipos["char<char"] = "boolean";
-    tabela_tipos["string<string"] = "boolean";
-    tabela_tipos["int<=int"] = "boolean";
-    tabela_tipos["float<=float"] = "boolean";
-    tabela_tipos["float<=int"] = "boolean";
-    tabela_tipos["char<=char"] = "boolean";
-    tabela_tipos["string<=string"] = "boolean";
-    
-    tabela_tipos["int==int"] = "boolean";
-    tabela_tipos["float==float"] = "boolean";
-    tabela_tipos["float==int"] = "boolean";
-    tabela_tipos["char==char"] = "boolean";
-    tabela_tipos["string==string"] = "boolean";
-    
-    tabela_tipos["int!=int"] = "boolean";
-    tabela_tipos["float!=float"] = "boolean";
-    tabela_tipos["float!=int"] = "boolean";
-    tabela_tipos["char!=char"] = "boolean";
-    tabela_tipos["string!=string"] = "boolean";
-    
-   /* tabela_tipos["int&&int"] = "int";//Tirar dúvida com o professor
-    tabela_tipos["int||int"] = "int";*/
-    
-    
+	// Para operadores relacionais, lógicos e atribuicao, a tabela da o tipo de cast6
+	
+	//Tabela de Operação para maior    
+    tabela_tipos["int>int"] = "int";
+    tabela_tipos["int>float"] = "ERRO";
+    tabela_tipos["float>int"] = "ERRO";
+    tabela_tipos["int>string"] = "ERRO";
+    tabela_tipos["string>int"] = "ERRO";
+    tabela_tipos["int>char"] = "ERRO"; //ERRO
+    tabela_tipos["char>int"] = "ERRO";//ERRO
+    tabela_tipos["float>float"] = "int";
+    tabela_tipos["float>string"] = "ERRO";
+    tabela_tipos["string>float"] = "ERRO";
+    tabela_tipos["char>char"] = "int";
+    tabela_tipos["char>string"] = "ERRO";
+    tabela_tipos["string>char"] = "ERRO";
+    tabela_tipos["string>string"] = "int"; 
+
+    //Tabela de Operação para maior e igual
+    tabela_tipos["int>=int"] = "int";
+    tabela_tipos["int>=float"] = "ERRO";
+    tabela_tipos["float>=int"] = "ERRO";
+    tabela_tipos["int>=string"] = "ERRO";
+    tabela_tipos["string>=int"] = "ERRO";
+    tabela_tipos["int>=char"] = "ERRO"; //ERRO
+    tabela_tipos["char>=int"] = "ERRO";//ERRO
+    tabela_tipos["float>=float"] = "int";
+    tabela_tipos["float>=string"] = "ERRO";
+    tabela_tipos["string>=float"] = "ERRO";
+    tabela_tipos["char>=char"] = "int";
+    tabela_tipos["char>=string"] = "ERRO";
+    tabela_tipos["string>=char"] = "ERRO";
+    tabela_tipos["string>=string"] = "int"; 
+
+    //Tabela de Operação para menor    
+    tabela_tipos["int<int"] = "int";
+    tabela_tipos["int<float"] = "ERRO";
+    tabela_tipos["float<int"] = "ERRO";
+    tabela_tipos["int<string"] = "ERRO";
+    tabela_tipos["string<int"] = "ERRO";
+    tabela_tipos["int<char"] = "ERRO"; //ERRO
+    tabela_tipos["char<int"] = "ERRO";//ERRO
+    tabela_tipos["float<float"] = "int";
+    tabela_tipos["float<string"] = "ERRO";
+    tabela_tipos["string<float"] = "ERRO";
+    tabela_tipos["char<char"] = "int";
+    tabela_tipos["char<string"] = "ERRO";
+    tabela_tipos["string<char"] = "ERRO";
+    tabela_tipos["string<string"] = "int";
+
+
+    //Tabela de Operação para menor e igual    
+    tabela_tipos["int<=int"] = "int";
+    tabela_tipos["int<=float"] = "ERRO";
+    tabela_tipos["float<=int"] = "ERRO";
+    tabela_tipos["int<=string"] = "ERRO";
+    tabela_tipos["string<=int"] = "ERRO";
+    tabela_tipos["int<=char"] = "ERRO"; //ERRO
+    tabela_tipos["char<=int"] = "ERRO";//ERRO
+    tabela_tipos["float<=float"] = "int";
+    tabela_tipos["float<=string"] = "ERRO";
+    tabela_tipos["string<=float"] = "ERRO";
+    tabela_tipos["char<=char"] = "int";
+    tabela_tipos["char<=string"] = "ERRO";
+    tabela_tipos["string<=char"] = "ERRO";
+    tabela_tipos["string<=string"] = "int";
+
+    //Tabela de Operação para  igual    
+    tabela_tipos["int==int"] = "int";
+    tabela_tipos["int==float"] = "ERRO";
+    tabela_tipos["float==int"] = "ERRO";
+    tabela_tipos["int==string"] = "ERRO";
+    tabela_tipos["string==int"] = "ERRO";
+    tabela_tipos["int==char"] = "ERRO"; //ERRO
+    tabela_tipos["char==int"] = "ERRO";//ERRO
+    tabela_tipos["float==float"] = "int";
+    tabela_tipos["float==string"] = "ERRO";
+    tabela_tipos["string==float"] = "ERRO";
+    tabela_tipos["char==char"] = "int";
+    tabela_tipos["char==string"] = "ERRO";
+    tabela_tipos["string==char"] = "ERRO";
+    tabela_tipos["string==string"] = "int";
+
+    //Tabela de Operação para  diferente    
+    tabela_tipos["int!=int"] = "int";
+    tabela_tipos["int!=float"] = "ERRO";
+    tabela_tipos["float!=int"] = "ERRO";
+    tabela_tipos["int!=string"] = "ERRO";
+    tabela_tipos["string!=int"] = "ERRO";
+    tabela_tipos["int!=char"] = "ERRO"; //ERRO
+    tabela_tipos["char!=int"] = "ERRO";//ERRO
+    tabela_tipos["float!=float"] = "int";
+    tabela_tipos["float!=string"] = "ERRO";
+    tabela_tipos["string!=float"] = "ERRO";
+    tabela_tipos["char!=char"] = "int";
+    tabela_tipos["char!=string"] = "ERRO";
+    tabela_tipos["string!=char"] = "ERRO";
+    tabela_tipos["string!=string"] = "int";
+   	
+   	//Tabela de Operação para atribuição 
+   	tabela_tipos["int=int"] = "int";
     tabela_tipos["int=float"] = "int";
-    tabela_tipos["int=char"] = "int";
     tabela_tipos["float=int"] = "float";
-    tabela_tipos["char=int"] = "char";
+    tabela_tipos["int=string"] = "ERRO";
+    tabela_tipos["string=int"] = "string";
+    tabela_tipos["int=char"] = "ERRO";
+    tabela_tipos["char=int"] = "ERRO";
+    tabela_tipos["float=float"] = "float";
+    tabela_tipos["float=string"] = "ERRO";
+    tabela_tipos["string=float"] = "string";
+    tabela_tipos["char=char"] = "char";
+    tabela_tipos["char=string"] = "ERRO";
     tabela_tipos["string=char"] = "string";
-	tabela_tipos["float=int"] = "float";
+    tabela_tipos["string=string"] = "string";
    	
     
     return tabela_tipos;   

@@ -1,13 +1,10 @@
-int var = 10;
+
 int main()
 {	
-	int tests;
-	float b = 0.0;
-	int a = b + 4;
+
 	boolean c = TRUE;
-	c = 5.0<3;
 	
-	if(c=="TRUE")
+	if(c==TRUE)
 	{
 		int te = 10;
 	}
