@@ -3,9 +3,14 @@ int main()
 {	
 
 	boolean c = TRUE;
+	int te;
 	
 	if(c==TRUE)
 	{
-		int te = 10;
+		te = 10.0 + c;
+	}
+	else
+	{
+		te = 20;
 	}
 }
