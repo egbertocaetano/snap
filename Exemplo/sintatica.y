@@ -24,6 +24,13 @@ struct atributos
 };
 typedef struct atributos atributos;
 
+// struct funcao_primitiva
+// {
+// 	string label;
+// 	string tmp;
+// };
+// typedef struct funcao_primitiva funcao_primitiva;
+
 typedef map<string , atributos> TABELA;
 typedef map<string , atributos>::iterator ITERATOR;
 
@@ -135,30 +142,30 @@ COMANDOS	: COMANDO
 
 COMANDO 	: DECLARACAO ';'
 			| ATRIBUICAO ';'
-			| TK_IF '(' E ')' BLOCO
+			| TK_IF '(' E ')' BLOCO  // ta certo
 			{
-				$$.traducao= "\n" + $3.traducao + "\n\t" + "if(!" + $3.tmp + ")goto FIM_IF\n" + $5.traducao + "\n\tFIM_IF:\n";
+				$$.traducao= "\n" + $3.traducao + "\n\t" + "if(!" + $3.tmp + ")goto FIM_IF;\n" + $5.traducao + "\n\tFIM_IF:\n";
 			}
-			| TK_IF '(' E ')' BLOCO TK_ELSE BLOCO
+			| TK_IF '(' E ')' BLOCO TK_ELSE BLOCO // ta certo
 			{
 				
-				$$.traducao= "\n" + $3.traducao + "\n\t" + "if(!" + $3.tmp + ")goto ELSE\n" + $5.traducao + "\tgoto FIM_IF\n" 
+				$$.traducao= "\n" + $3.traducao + "\n\t" + "if(!" + $3.tmp + ")goto ELSE;\n" + $5.traducao + "\tgoto FIM_IF;\n" 
 							+ "\n\tELSE:\n" + $7.traducao + "\n\tFIM_IF:\n";				
 			}
-			| TK_WHILE '(' E ')' BLOCO // obs: ve se precisa colocar ; pra fechar  while e do while
+			| TK_WHILE '(' E ')' BLOCO // ta certo
 			{
-				$$.traducao= "\n" + $3.traducao + "\n\t" + "LOOP:\n\twhile(!" + $3.tmp + ")goto FIM_WHILE\n" + $5.traducao + "\tgoto LOOP\n"
+				$$.traducao= "\n\tLOOP:\n" + $3.traducao + "\n\tif(!" + $3.tmp + ")goto FIM_WHILE;\n" + $5.traducao + "\n\tgoto LOOP;\n"
 				+"\tFIM_WHILE:\n";
 
 			}
-			| TK_DO BLOCO TK_WHILE '(' E ')' ';'
+			| TK_DO BLOCO TK_WHILE '(' E ')' ';' // ta certo
 			{
-				$$.traducao= "\n" + $5.traducao + "\n\t" + "LOOP:\n\tdo\n" + $2.traducao + "\twhile(" + $5.tmp + ")goto LOOP\n";
+				$$.traducao= "\n\tLOOP:\n" + $5.traducao + "\n" + $2.traducao + "\tif(" + $5.tmp + ")goto LOOP;\n";
 			}
-			|  TK_FOR '(' DECLARACAO ';' E ';' TK_ID TK_OPERADOR_CREMENTO ')' BLOCO 
+			|  TK_FOR '(' DECLARACAO ';' E ';' ATRIBUICAO ')' BLOCO //ta certo
 			{
-				$$.traducao= "\n" + $5.traducao + "\n\t" + "\n" + $3.traducao + "\n\t" "LOOP:\n\tfor(" + $3.tmp + ";" + $5.tmp + ";" + $8.traducao +")"
-				 + $9.traducao + "FIM_FOR"; // corrigir o ++ e -- ta cagado
+				$$.traducao= "\n" + $3.traducao + "\n\tLOOP:\n" + $5.traducao + "\n\t" "\n\tif(!" + $5.tmp + ") goto FIM_FOR; "
+				  + "\n" + $9.traducao + "\n" + $7.traducao + "\n\tgoto LOOP;\n\tFIM_FOR;\n"; 
 			}
 			;
 
@@ -199,16 +206,6 @@ ATRIBUICAO	: TK_ID TK_ATRIBUICAO E
 				traducaoOpAritmeticaIncDec(&$$, &$2, &$1);
 			}
 			
-			// |TK_ID TK_OPERADOR_CREMENTO
-			// {	
-			// 	//Nessa parte precisa verificar se TK_ID pertence ao contexto atual
-			// 	if ($2.label == "++")
-			// 	{
-			// 		$2.valor = 1 ;
-			// 		$2.tipo = "int" ;
-			// 		operacaoAritmetica(&$$, &$1, "+", &$2);
-			// 	}
-			//};;
 
 E 			:'(' E ')'
 			{
@@ -532,21 +529,24 @@ void operacaoAritmetica(atributos * dolar, atributos * dolar1, atributos * dolar
 
 void traducaoOpAritmeticaIncDec(atributos* dolar, atributos* dolar1,atributos* dolar2)
 {	
-		TABELA * tab = pilhaDeTabelas.front();
-	//Verificando se há necessidade de fazer cast. Caso sim, decidir o tipo da nova variavel temporaria para o cast
-	
-		// dolar->tmp = geraTemp(dolar1->tipo, LOCAL);
-		// dolar->tipo = dolar1->tipo;	
-		//dolar->traducao = dolar1->traducao + dolar2->traducao + "\t" + dolar->tmp + " = " + dolar1->tmp + " + " + dolar2->tmp + ";\n";	
-	
-		if (dolar2->label == "++") { 
-			dolar->traducao = dolar1->traducao + "\t" + dolar->tmp + " = " + dolar1->tmp + " + 1;\n";	
-	
-		}
-		else if (dolar2->label == "--") {
-			dolar->traducao = dolar1->traducao + "\t" + dolar->tmp + " = " + dolar1->tmp + " - 1;\n";	
-		}
+		TABELA * tab = existeID(dolar1->label);
 
+		if(tab == NULL)
+			yyerror( "Variavel " + dolar1->label + " nao declarada!");
+		
+		dolar->tmp = geraTemp((*tab)[dolar1->label].tipo, LOCAL);
+		dolar->tipo = (*tab)[dolar1->label].tipo;	
+		dolar->traducao = "\n\t" + dolar->tmp + " = " + "1;\n";
+		dolar2->valor = 1;	
+	
+		if (dolar2->operador == "++") 
+			dolar->traducao += "\t" + (*tab)[dolar1->label].tmp + " = " + (*tab)[dolar1->label].tmp + " + " + dolar->tmp + ";\n";
+		else if (dolar2->operador == "--")
+			dolar->traducao += "\t" + (*tab)[dolar1->label].tmp + " = " + (*tab)[dolar1->label].tmp + " - " + dolar->tmp + ";\n";
+		else
+			yyerror( "Variavel " + dolar2->operador + " em formato incorreto !");
+
+		
 		(*tab)[dolar->label].tmp =  dolar->tmp;
 		(*tab)[dolar->label].label = dolar->label;
 		(*tab)[dolar->label].tipo = dolar->tipo;
