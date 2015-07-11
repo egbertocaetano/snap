@@ -4,4 +4,8 @@ all:
 		yacc -dv sintatica.y
 		g++ -o snp y.tab.c -lfl
 
-		./snp < exemplo.snap
+		./snp < exemplo.snap > Test.c
+
+		g++ Test.c -o t
+
+		./t

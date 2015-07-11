@@ -13,6 +13,7 @@ NUM {DIGITO}+
 REAL {NUM}+("."{NUM}+)?
 CHAR \'({LETRA}|{NUM})\'
 ID {LETRA}({LETRA}|{NUM})*
+STRING [\"].*[\"]|[\'].*[\']
 
 %%
 
@@ -29,10 +30,17 @@ ID {LETRA}({LETRA}|{NUM})*
 "boolean"		{ yylval.tipo = yytext; return TK_TIPO_BOOLEAN;}
 "if"			{ return TK_IF;}
 "else"			{ return TK_ELSE;}
+"elif"			{ return TK_ELIF;}
 "for"			{ return TK_FOR;}
 "while"			{ return TK_WHILE;}
 "do"            { return TK_DO;}
-
+"break"			{ return TK_BREAK;}
+"continue"		{ return TK_CONTINUE;}
+"switch"		{ return TK_SWITCH;}
+"case"			{ return TK_CASE;}
+"default"		{ return TK_DEFAULT;}
+"write"			{ return TK_WRITE;}
+"read"			{ return TK_READ;}
 
 "="			{yylval.operador = yytext; return TK_ATRIBUICAO;}
 
@@ -54,6 +62,7 @@ ID {LETRA}({LETRA}|{NUM})*
 {NUM}		{ yylval.valor = yytext; yylval.tipo = "int"; return TK_NUM; }
 {REAL}		{ yylval.valor = yytext; yylval.tipo = "float"; return TK_REAL; }
 {CHAR}		{ yylval.valor = yytext; yylval.tipo = "char"; return TK_CHAR; }
+{STRING}	{ yylval.valor = yytext; yylval.tipo = "string"; return TK_STRING; }
 "TRUE"		{ yylval.valor = yytext; yylval.tipo = "boolean"; return TK_VALOR_LOGICO; }
 "FALSE"		{ yylval.valor = yytext; yylval.tipo = "boolean"; return TK_VALOR_LOGICO; }
 {ID}		{ yylval.label = yytext; return TK_ID; }
