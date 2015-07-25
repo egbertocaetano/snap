@@ -1,0 +1,22 @@
+float t = 0.0;
+int main()
+{	
+	int c = 0;
+
+	if(t == 0.0){
+		t = 1.1;
+	}
+	elif(c == 0)
+	{
+		c = t + 1;
+	}
+	else
+	{
+		t = c;
+	}
+
+	float r = t + c;
+
+	write(r);
+
+}

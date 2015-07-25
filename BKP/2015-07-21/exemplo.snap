@@ -2,9 +2,9 @@ int z = 0;
 int main()
 {	
 	int a;
-	float b = 3.0;
+	a=0;
 
-	a = b;
+	a = a + 1;
 
 	/*while(a<3)
 	{

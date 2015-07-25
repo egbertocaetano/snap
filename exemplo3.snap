@@ -1,0 +1,22 @@
+int main()
+{
+	int a = 0 ;
+
+
+	while(a < 3)
+	{
+		a++;
+		write(a);
+	}
+
+	int b;
+	b=0;
+	
+	do
+	{
+		b++;
+		write(b);
+
+	}while(b<3);
+
+}

@@ -1,0 +1,6 @@
+*.yy.c
+snp
+*.output
+*.tab.c
+*.tab.h
+

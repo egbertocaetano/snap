@@ -1,0 +1,24 @@
+
+void impressao(float num){
+	
+	write(num);
+}
+
+void multiplica(float a, int b){
+	
+	float c=0.0;
+	c=a*b;
+
+	write(c);
+}
+
+int main()
+{	
+	float a;
+	int b;
+
+	read(a);
+	read(b);
+
+	multiplica(a,b);
+}

@@ -1,0 +1,10 @@
+int main()
+{
+	string s = "snap";
+	string t = "knap";
+	string c;
+
+	c = s + t;
+
+	write(c);
+}

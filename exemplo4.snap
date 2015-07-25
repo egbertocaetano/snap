@@ -1,0 +1,28 @@
+int prin = 7;
+
+int fibonacci(int num)
+{
+
+	int t;
+	int i = 1;
+	int j = 0;
+
+  	for (int k = 1; k <= num; k++)
+    {
+      t = i + j;
+      i = j;
+      j = t;
+    }
+
+  return j;
+}
+
+int main()
+{
+
+	int resultado;
+	resultado = fibonacci(prin);
+
+	write(resultado);
+	
+}

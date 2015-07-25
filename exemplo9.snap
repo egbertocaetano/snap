@@ -1,0 +1,18 @@
+string t = "Amor";
+
+int main()
+{	
+	string in;
+	string j = "Hamashia";
+
+	t = t + " " + j;
+
+	write(t);
+
+	in = in + " " + t;
+
+	read(in);
+
+		
+
+}
